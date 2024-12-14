@@ -3,14 +3,16 @@
 
 // export default nextConfig;
 
-const isProd = process.env.NODE_ENV === 'production';
+// const isProd = process.env.NODE_ENV === 'production';
 const nextConfig = {
     reactStrictMode: true,
     images: {
         unoptimized: true, // Disable default image optimization
     },
-    assetPrefix: isProd ? '/fedemagnani.github.io/' : '',
-    basePath: isProd ? '/fedemagnani.github.io' : '',
+    // assetPrefix: isProd ? '/fedemagnani.github.io/' : '',
+    // basePath: isProd ? '/fedemagnani.github.io' : '',
+    assetPrefix: '',
+    basePath: '',
     output: 'export'
 };
 
