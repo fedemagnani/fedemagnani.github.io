@@ -1,5 +1,5 @@
-title: Federico Magnani
-description: Litterarum radices amaras, fructus dulces.
+title: Federico Magnani's blog
+description: Rust, Computational Mathematics, Finance and other stuff. God bless pane & olio.
 baseurl: "" # Leave empty for user sites, "/repo-name" for project sites
 url: "https://fedemagnani.github.io" # Your GitHub Pages URL
 
@@ -9,19 +9,18 @@ theme_config:
   appearance: "light" # can be "light", "dark" or "auto"
   back_home_text: ".." # customize text for homepage link in post layout
   date_format: "%Y-%m-%d" # customize how date is formatted
-  show_description: false # show blog description in home page
+  show_description: true # show blog description in home page
   lowercase_titles: true # show titles in lowercase in lists
 
+
+collections:
+  projects:
+    output: false
+  writings:
+    output: false
 
 plugins:
   - jekyll-feed
   - jekyll-sitemap
   - jekyll-remote-theme
 
-jektex:
-  cache_dir: ".jektex-cache"
-  ignore: ["*.xml"]
-  silent: false
-  macros:
-    - ["\\Q", "\\mathbb{Q}"]
-    - ["\\C", "\\mathbb{C}"]

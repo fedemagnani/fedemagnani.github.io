@@ -1,16 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url>
-<loc>http://localhost:4000/about/</loc>
+<loc>http://localhost:4000/cs/2024/01/15/cs.html</loc>
+<lastmod>2024-01-15T00:00:00+01:00</lastmod>
 </url>
 <url>
-<loc>http://localhost:4000/contact/</loc>
+<loc>http://localhost:4000/fin/2024/01/15/finance.html</loc>
+<lastmod>2024-01-15T00:00:00+01:00</lastmod>
+</url>
+<url>
+<loc>http://localhost:4000/math/2024/01/15/math.html</loc>
+<lastmod>2024-01-15T00:00:00+01:00</lastmod>
+</url>
+<url>
+<loc>http://localhost:4000/cs-archive/</loc>
+</url>
+<url>
+<loc>http://localhost:4000/fin-archive/</loc>
+</url>
+<url>
+<loc>http://localhost:4000/</loc>
 </url>
 <url>
 <loc>http://localhost:4000/blog/</loc>
 </url>
 <url>
-<loc>http://localhost:4000/</loc>
+<loc>http://localhost:4000/math-archive/</loc>
 </url>
 <url>
 <loc>http://localhost:4000/blog/first-post/</loc>

@@ -1,1 +1,52 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.3.4">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2025-06-30T19:52:03+02:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">Federico Magnani</title><subtitle>Litterarum radices amaras, fructus dulces.</subtitle></feed>
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Federico Magnani&apos;s blog</title>
+    <description>Rust, Computational Mathematics, Finance and other stuff. God bless pane &amp; olio.</description>
+    <link>http://localhost:4000/</link>
+    <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml"/>
+    <pubDate>Tue, 01 Jul 2025 01:21:27 +0200</pubDate>
+    <lastBuildDate>Tue, 01 Jul 2025 01:21:27 +0200</lastBuildDate>
+    <generator>Jekyll v4.3.4</generator>
+    
+      <item>
+        <title>Blank math post</title>
+        <description>&lt;p&gt;ooo&lt;/p&gt;
+</description>
+        <pubDate>Mon, 15 Jan 2024 00:00:00 +0100</pubDate>
+        <link>http://localhost:4000/math/2024/01/15/math.html</link>
+        <guid isPermaLink="true">http://localhost:4000/math/2024/01/15/math.html</guid>
+        
+        
+        <category>math</category>
+        
+      </item>
+    
+      <item>
+        <title>Blank finance post</title>
+        <description>&lt;p&gt;ooo&lt;/p&gt;
+</description>
+        <pubDate>Mon, 15 Jan 2024 00:00:00 +0100</pubDate>
+        <link>http://localhost:4000/fin/2024/01/15/finance.html</link>
+        <guid isPermaLink="true">http://localhost:4000/fin/2024/01/15/finance.html</guid>
+        
+        
+        <category>fin</category>
+        
+      </item>
+    
+      <item>
+        <title>Blank CS post</title>
+        <description>
+</description>
+        <pubDate>Mon, 15 Jan 2024 00:00:00 +0100</pubDate>
+        <link>http://localhost:4000/cs/2024/01/15/cs.html</link>
+        <guid isPermaLink="true">http://localhost:4000/cs/2024/01/15/cs.html</guid>
+        
+        
+        <category>cs</category>
+        
+      </item>
+    
+  </channel>
+</rss>

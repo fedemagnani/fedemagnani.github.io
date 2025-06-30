@@ -1,18 +1,65 @@
 ---
 layout: home
 title: Home
+custom_js: rand-fact-fetcher
 ---
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet" />
+<link rel="alternate" type="application/rss+xml" href="{{ site.url }}/feed.xml">
 
-# Welcome to My Website
+### Blog stuff
+- [math](/math-archive)
+- [finance](/fin-archive)
+- [computer-science](/cs-archive)
 
-This is the homepage of my multi-page website built with GitHub Pages and Markdown.
 
-## What you'll find here
+### Projects
 
-- Information about me on the [About](/about) page
-- Ways to get in touch on the [Contact](/contact) page  
-- My latest thoughts on the [Blog](/blog) page
+<ul style="list-style-type: disc; padding-left: 1.5rem;">
+{% for project in site.projects %}
+ <li style="margin-bottom: 1rem;">
+    <strong style="vertical-align: middle;">
+      <a href="{{ project.github }}" style="vertical-align: middle;">
+        {{ project.title }}
+      </a>
+    </strong>
+    <span style="margin-left: 0.5rem;">
+      <img src="{{ project.stars_badge }}" alt="Stars" style="vertical-align: text-bottom; display: inline-block;" />
+      <img src="{{ project.downloads_badge }}" alt="Downloads" style="vertical-align: text-bottom; display: inline-block;" />
+      <a href="{{ project.docs }}" style="vertical-align: text-bottom; display: inline-block;">
+        <img src="{{ project.docs_badge }}" alt="Documentation" style="vertical-align: text-bottom;" />
+      </a>
+    </span>
+    <div style=";">
+      {{ project.description }}
+    </div>
+  </li>
+{% endfor %}
+</ul>
 
-## Recent Updates
+### Writings
+<ul style="list-style-type: disc; padding-left: 1.5rem;">
+{% for writing in site.writings %}
+ <li style="margin-bottom: 1rem;">
+    <strong style="vertical-align: middle;">
+      <a href="{{ writing.link }}" style="vertical-align: middle;">
+        {{ writing.title }}
+      </a>
+    </strong>
+    <div style=";">
+      {{ writing.description }}
+    </div>
+  </li>
+{% endfor %}
+</ul>
 
-Check back regularly for new content and updates!
+
+
+
+
+<!-- <div style="padding-top: 80px; padding-bottom: 80px;">
+ {% include rand-fact-button.html %}
+</div> -->
+
+
+{% include footer.html %}
+
