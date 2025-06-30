@@ -1,0 +1,18 @@
+title: Federico Magnani
+description: Litterarum radices amaras, fructus dulces.
+baseurl: "" # Leave empty for user sites, "/repo-name" for project sites
+url: "https://fedemagnani.github.io" # Your GitHub Pages URL
+
+theme: minima
+
+# Navigation
+header_pages:
+  - about.md
+  - contact.md
+  - blog/index.md
+
+# Build settings
+markdown: kramdown
+plugins:
+  - jekyll-feed
+  - jekyll-sitemap
