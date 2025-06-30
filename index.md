@@ -23,8 +23,12 @@ custom_js: rand-fact-fetcher
       </a>
     </strong>
     <span style="margin-left: 0.5rem;">
-      <img src="{{ project.stars_badge }}" alt="Stars" style="vertical-align: text-bottom; display: inline-block;" />
-      <img src="{{ project.downloads_badge }}" alt="Downloads" style="vertical-align: text-bottom; display: inline-block;" />
+      <a href="{{ project.github }}" style="vertical-align: text-bottom; display: inline-block;">
+        <img src="{{ project.stars_badge }}" alt="Stars" style="vertical-align: text-bottom; display: inline-block;" />
+      </a>
+      <a href="{{ project.cratesdotio }}" style="vertical-align: text-bottom; display: inline-block;">
+        <img src="{{ project.downloads_badge }}" alt="Downloads" style="vertical-align: text-bottom; display: inline-block;" />
+      </a>
       <a href="{{ project.docs }}" style="vertical-align: text-bottom; display: inline-block;">
         <img src="{{ project.docs_badge }}" alt="Documentation" style="vertical-align: text-bottom;" />
       </a>
