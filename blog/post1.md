@@ -16,3 +16,7 @@ Building a website with GitHub Pages and Markdown is surprisingly easy and power
 ## Next steps
 
 I plan to add more content and maybe customize the styling further.
+
+<div style="overflow:auto;">
+<iframe src="https://www.desmos.com/calculator/a7ad7b1bc2?embed" width="500" height="500" style="border: 1px solid #ccc" frameborder=0></iframe>
+</div>
