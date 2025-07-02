@@ -36,7 +36,7 @@ class FactFetcher {
         try {
             const response = await fetch(this.apiUrl, {
                 headers: {
-                    'X-Api-Key': 'o4uq7cWneJp6ynIavJWGew==DM6SP8WMbkaAoSsI'
+                    'X-Api-Key': 'API_KEY'
                 }
             });
 
