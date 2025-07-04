@@ -5,8 +5,8 @@
     <description>Rust, Computational Mathematics, Finance and other stuff. God bless pane &amp; olio.</description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Sat, 05 Jul 2025 01:47:08 +0200</pubDate>
-    <lastBuildDate>Sat, 05 Jul 2025 01:47:08 +0200</lastBuildDate>
+    <pubDate>Sat, 05 Jul 2025 01:50:20 +0200</pubDate>
+    <lastBuildDate>Sat, 05 Jul 2025 01:50:20 +0200</lastBuildDate>
     <generator>Jekyll v4.3.4</generator>
     
       <item>
@@ -255,9 +255,9 @@ You can see the behavior of these support functions below, play with it!&lt;/p&g
 
 &lt;p&gt;See you next time!&lt;/p&gt;
 </description>
-        <pubDate>Thu, 04 Jul 2024 00:00:00 +0200</pubDate>
-        <link>http://localhost:4000/math/2024/07/04/fenchel.html</link>
-        <guid isPermaLink="true">http://localhost:4000/math/2024/07/04/fenchel.html</guid>
+        <pubDate>Fri, 04 Jul 2025 00:00:00 +0200</pubDate>
+        <link>http://localhost:4000/math/2025/07/04/fenchel.html</link>
+        <guid isPermaLink="true">http://localhost:4000/math/2025/07/04/fenchel.html</guid>
         
         
         <category>math</category>
@@ -268,9 +268,9 @@ You can see the behavior of these support functions below, play with it!&lt;/p&g
         <title>Blank finance post</title>
         <description>&lt;p&gt;Wip!&lt;/p&gt;
 </description>
-        <pubDate>Mon, 15 Jan 2024 00:00:00 +0100</pubDate>
-        <link>http://localhost:4000/fin/2024/01/15/finance.html</link>
-        <guid isPermaLink="true">http://localhost:4000/fin/2024/01/15/finance.html</guid>
+        <pubDate>Wed, 15 Jan 2025 00:00:00 +0100</pubDate>
+        <link>http://localhost:4000/fin/2025/01/15/finance.html</link>
+        <guid isPermaLink="true">http://localhost:4000/fin/2025/01/15/finance.html</guid>
         
         
         <category>fin</category>
@@ -281,9 +281,9 @@ You can see the behavior of these support functions below, play with it!&lt;/p&g
         <title>Blank CS post</title>
         <description>&lt;p&gt;Wip!&lt;/p&gt;
 </description>
-        <pubDate>Mon, 15 Jan 2024 00:00:00 +0100</pubDate>
-        <link>http://localhost:4000/cs/2024/01/15/cs.html</link>
-        <guid isPermaLink="true">http://localhost:4000/cs/2024/01/15/cs.html</guid>
+        <pubDate>Wed, 15 Jan 2025 00:00:00 +0100</pubDate>
+        <link>http://localhost:4000/cs/2025/01/15/cs.html</link>
+        <guid isPermaLink="true">http://localhost:4000/cs/2025/01/15/cs.html</guid>
         
         
         <category>cs</category>
