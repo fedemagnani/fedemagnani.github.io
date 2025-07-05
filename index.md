@@ -5,6 +5,7 @@ custom_js: rand-fact-fetcher
 ---
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet" />
 <link rel="alternate" type="application/rss+xml" href="{{ site.url }}/feed.xml">
+{% seo %}
 
 ### Blog stuff (WIP)
 - [math](/math-archive)
