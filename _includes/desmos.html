@@ -1,5 +1,5 @@
-<div style="overflow:auto;">
-    <iframe src="{{ include.src | escape }}" width="{{ include.width | default: '500' }}"
-        height="{{ include.height | default: '500' }}" style="border: 1px solid #ccc" frameborder="0">
+<div style="overflow:auto; border: 1px solid #ccc;">
+    <iframe src="{{ include.src | escape }}" height="{{ include.height | default: '500' }}"
+        style="width: 100%; border: 0;" frameborder="0">
     </iframe>
 </div>
