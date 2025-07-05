@@ -19,9 +19,17 @@ collections:
   writings:
     output: false
 
+
+jekyll_analytics:
+  GoogleAnalytics:          # Add, if you want to track with Google Analytics
+    id: G-HKMV72T3J1         
+    anonymizeIp: true      
+
 plugins:
   - jekyll-feed
   - jekyll-sitemap
   - jekyll-remote-theme
   - jekyll-seo-tag
+  - jekyll-analytics
+
 
