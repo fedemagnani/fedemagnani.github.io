@@ -30,6 +30,4 @@ plugins:
   - jekyll-sitemap
   - jekyll-remote-theme
   - jekyll-seo-tag
-  - jekyll-analytics
-
 

@@ -6,7 +6,6 @@ gem "csv", "~> 3.2"  # Add this line
 gem "base64", "~> 0.2"
 gem "jektex"
 
-# If you have any plugins, put them here!
 group :jekyll_plugins do
   gem "jekyll-feed", "~> 0.12"
   gem "jekyll-sitemap", "~> 1.4"
