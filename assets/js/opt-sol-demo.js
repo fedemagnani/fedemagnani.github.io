@@ -1,4 +1,4 @@
-import init, { OptimizationSolver, log } from '/opt-sol-pkg/optimization_solvers.js';
+import init, { OptimizationSolver, log } from '/assets/opt-sol-pkg/optimization_solvers.js';
 
 let wasmModule = null;
 let optimizationHistory = [];
@@ -15,7 +15,7 @@ async function initWasm() {
 
         // Debug: Log the current URL and module path
         console.log('Current URL:', window.location.href);
-        console.log('Attempting to load module from:', '/opt-sol-pkg/optimization_solvers.js');
+        console.log('Attempting to load module from:', '/assets/opt-sol-pkg/optimization_solvers.js');
 
         // Load the WASM module
         wasmModule = await init();
@@ -56,7 +56,7 @@ async function initWasm() {
             <h3>❌ Failed to Load WASM Module</h3>
             <p><strong>Error:</strong> ${error.message}</p>
             <p><strong>URL:</strong> ${window.location.href}</p>
-            <p><strong>Module Path:</strong> /opt-sol-pkg/optimization_solvers.js</p>
+            <p><strong>Module Path:</strong> /assets/opt-sol-pkg/optimization_solvers.js</p>
             <p>Please check your internet connection and try refreshing the page.</p>
             <p>If the problem persists, the WASM module might not be available on this server.</p>
         `;

@@ -31,7 +31,3 @@ plugins:
   - jekyll-remote-theme
   - jekyll-seo-tag
 
-# Ensure WASM files are served with correct MIME type
-include:
-  - opt-sol-pkg
-
