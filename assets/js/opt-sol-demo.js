@@ -5,13 +5,61 @@ let optimizationHistory = [];
 
 // Initialize WASM module
 async function initWasm() {
+    const runBtn = document.getElementById('run-btn');
+    const resultDiv = document.getElementById('result');
+
     try {
+        // Show loading state
+        runBtn.disabled = true;
+        runBtn.textContent = '🔄 Loading WASM module...';
+
+        // Debug: Log the current URL and module path
+        console.log('Current URL:', window.location.href);
+        console.log('Attempting to load module from:', '/opt-sol-pkg/optimization_solvers.js');
+
+        // Load the WASM module
         wasmModule = await init();
         console.log('WASM module loaded successfully');
-        document.getElementById('run-btn').disabled = false;
+
+        // Enable the button
+        runBtn.disabled = false;
+        runBtn.textContent = '🚀 Run Optimization';
+
+        // Show success message
+        resultDiv.style.display = 'block';
+        resultDiv.className = 'result success';
+        resultDiv.innerHTML = `
+            <h3>✅ WASM Module Loaded Successfully!</h3>
+            <p>The optimization solvers are ready to use.</p>
+        `;
+
+        // Hide success message after 3 seconds
+        setTimeout(() => {
+            resultDiv.style.display = 'none';
+        }, 3000);
+
     } catch (error) {
         console.error('Failed to load WASM module:', error);
-        alert('Failed to load optimization solvers. Please check the console for details.');
+        console.error('Error details:', {
+            name: error.name,
+            message: error.message,
+            stack: error.stack
+        });
+
+        // Show error state
+        runBtn.disabled = true;
+        runBtn.textContent = '❌ Failed to Load';
+
+        resultDiv.style.display = 'block';
+        resultDiv.className = 'result error';
+        resultDiv.innerHTML = `
+            <h3>❌ Failed to Load WASM Module</h3>
+            <p><strong>Error:</strong> ${error.message}</p>
+            <p><strong>URL:</strong> ${window.location.href}</p>
+            <p><strong>Module Path:</strong> /opt-sol-pkg/optimization_solvers.js</p>
+            <p>Please check your internet connection and try refreshing the page.</p>
+            <p>If the problem persists, the WASM module might not be available on this server.</p>
+        `;
     }
 }
 
