@@ -1,0 +1,347 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Optimization Solvers - WASM Demo</title>
+    <style>
+        body {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            padding: 30px;
+            border-radius: 12px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .config-panel,
+        .result-panel {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+        }
+
+        .config-panel h2,
+        .result-panel h2 {
+            color: #495057;
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #007bff;
+        }
+
+        textarea {
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            resize: vertical;
+            min-height: 200px;
+        }
+
+        button {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        button:hover {
+            background: linear-gradient(135deg, #0056b3, #004085);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+        }
+
+        button:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .result {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #007bff;
+            background: white;
+            display: none;
+        }
+
+        .error {
+            border-left-color: #dc3545;
+            background-color: #f8d7da;
+        }
+
+        .success {
+            border-left-color: #28a745;
+            background-color: #d4edda;
+        }
+
+        .loading {
+            text-align: center;
+            color: #6c757d;
+            font-style: italic;
+        }
+
+        .function-templates {
+            margin-bottom: 20px;
+        }
+
+        .template-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+
+        .template-btn {
+            background: #6c757d;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background-color 0.3s ease;
+        }
+
+        .template-btn:hover {
+            background: #5a6268;
+        }
+
+        .solver-info {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            border-left: 4px solid #2196f3;
+        }
+
+        .solver-info h4 {
+            margin: 0 0 10px 0;
+            color: #1976d2;
+        }
+
+        .solver-info p {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+
+        .dimension-info {
+            background: #fff3cd;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            border-left: 4px solid #ffc107;
+            font-size: 14px;
+        }
+
+        .history-item {
+            background: white;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 6px;
+            border: 1px solid #e9ecef;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .history-item:hover {
+            border-color: #007bff;
+            box-shadow: 0 2px 8px rgba(0, 123, 255, 0.1);
+        }
+
+        .history-item h4 {
+            margin: 0 0 8px 0;
+            color: #495057;
+        }
+
+        .history-item p {
+            margin: 5px 0;
+            font-size: 13px;
+            color: #6c757d;
+        }
+
+        .clear-history {
+            background: #dc3545;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-top: 10px;
+        }
+
+        .clear-history:hover {
+            background: #c82333;
+        }
+
+        @media (max-width: 768px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body style="width: 100%; border: 0;">
+    <div class="container">
+        <h1>Optimization Solvers - WASM Demo <a href="/"
+                style="text-decoration: none; font-size: 0.6em; margin-left: 10px;" title="Back to Home">(home)</a>
+        </h1>
+
+        <div class="main-grid">
+            <!-- Configuration Panel -->
+            <div class="config-panel">
+                <h2>⚙️ Configuration</h2>
+
+                <!-- Solver Selection -->
+                <div class="input-group">
+                    <label for="solver-select">Choose Solver:</label>
+                    <select id="solver-select">
+                        <option value="gradient_descent">Gradient Descent</option>
+                        <option value="bfgs">BFGS Quasi-Newton</option>
+                        <option value="newton">Newton's Method</option>
+                    </select>
+                </div>
+
+                <!-- Initial Point -->
+                <div class="input-group">
+                    <label for="initial-point">Initial Point (comma-separated):</label>
+                    <input type="text" id="initial-point" value="2,1" placeholder="e.g., 2,1 or 1,2,3">
+                </div>
+
+                <!-- Dimension Info -->
+                <div class="dimension-info" id="dimension-info">
+                    <strong>Note:</strong> Detected 2 dimensions. Make sure your function handles this many variables.
+                </div>
+
+                <!-- Solver Parameters -->
+                <div class="input-group">
+                    <label for="tolerance">Tolerance:</label>
+                    <input type="number" id="tolerance" value="1e-6" step="1e-8">
+                </div>
+
+                <div class="input-group">
+                    <label for="max-iterations">Max Iterations:</label>
+                    <input type="number" id="max-iterations" value="100">
+                </div>
+
+                <!-- Function Templates -->
+                <div class="function-templates">
+                    <label>Function Templates:</label>
+                    <div class="template-buttons">
+                        <button class="template-btn" onclick="loadTemplate('quadratic')">Quadratic</button>
+                        <button class="template-btn" onclick="loadTemplate('rosenbrock')">Rosenbrock</button>
+                        <button class="template-btn" onclick="loadTemplate('ackley')">Ackley</button>
+                        <button class="template-btn" onclick="loadTemplate('sphere')">Sphere</button>
+                        <button class="template-btn" onclick="loadTemplate('custom')">Custom</button>
+                    </div>
+                </div>
+
+                <!-- Objective Function -->
+                <div class="input-group">
+                    <label for="objective-function">Objective Function (JavaScript):</label>
+                    <textarea id="objective-function" placeholder="// Write your objective function here
+// For gradient-only methods (Gradient Descent, BFGS):
+// Return [f, g1, g2, ...] where f is function value and g1,g2,... are gradient components
+
+// For Newton's method:
+// Return [f, g1, g2, h11, h12, h21, h22, ...] where h11,h12,h21,h22,... are Hessian components
+// Hessian matrix is [[h11, h12], [h21, h22]] for 2D problems
+
+function objective(x) {
+    const x1 = x[0];
+    const x2 = x[1];
+    
+    // Example: f(x,y) = x² + 2y²
+    const f = x1 * x1 + 2 * x2 * x2;
+    
+    // Gradient: [2x, 4y]
+    const g1 = 2 * x1;
+    const g2 = 4 * x2;
+    
+    // For gradient methods only:
+    return [f, g1, g2];
+    
+    // For Newton's method, also include Hessian:
+    // const h11 = 2;   // ∂²f/∂x²
+    // const h12 = 0;   // ∂²f/∂x∂y
+    // const h21 = 0;   // ∂²f/∂y∂x
+    // const h22 = 4;   // ∂²f/∂y²
+    // return [f, g1, g2, h11, h12, h21, h22];
+}"></textarea>
+                </div>
+
+                <!-- Run Button -->
+                <button onclick="runOptimization()" id="run-btn">🚀 Run Optimization</button>
+            </div>
+
+            <!-- Results Panel -->
+            <div class="result-panel">
+                <h2>📊 Results</h2>
+                <div id="result" class="result"></div>
+
+                <!-- History -->
+                <h3>📚 History</h3>
+                <div id="history"></div>
+                <button class="clear-history" onclick="clearHistory()">Clear History</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="/assets/js/opt-sol-demo.js"></script>
+</body>
+
+</html>
