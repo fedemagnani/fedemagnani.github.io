@@ -25,6 +25,10 @@ jekyll_analytics:
     id: G-HKMV72T3J1         
     anonymizeIp: true      
 
+include:
+  - assets/opt-sol-pkg
+  - assets/js
+
 plugins:
   - jekyll-feed
   - jekyll-sitemap
