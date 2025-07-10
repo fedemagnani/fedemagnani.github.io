@@ -26,8 +26,7 @@ jekyll_analytics:
     anonymizeIp: true      
 
 include:
-  - assets/opt-sol-pkg
-  - assets/js
+  - assets
 
 plugins:
   - jekyll-feed

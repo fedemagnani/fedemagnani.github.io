@@ -1,0 +1,31 @@
+{
+  "name": "optimization-solvers",
+  "type": "module",
+  "collaborators": [
+    "Federico Magnani <0xdrun@gmail.com>"
+  ],
+  "description": "Numerical optimization solvers for unconstrained and simple-bounds constrained convex optimization problems. Wasm compatible",
+  "version": "0.1.1",
+  "license": "MIT OR Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fedemagnani/optimization-solvers"
+  },
+  "files": [
+    "optimization_solvers_bg.wasm",
+    "optimization_solvers.js",
+    "optimization_solvers.d.ts"
+  ],
+  "main": "optimization_solvers.js",
+  "types": "optimization_solvers.d.ts",
+  "sideEffects": [
+    "./snippets/*"
+  ],
+  "keywords": [
+    "optimization",
+    "convex",
+    "minimization",
+    "solver",
+    "math"
+  ]
+}
