@@ -278,8 +278,19 @@ function parseInput(input) {
     return input.split(',').map(x => parseFloat(x.trim())).filter(x => !isNaN(x));
 }
 
+// Format execution time with appropriate unit
+function formatExecutionTime(timeMs) {
+    if (timeMs < 1) {
+        return `${(timeMs * 1000).toFixed(2)} μs`;
+    } else if (timeMs < 1000) {
+        return `${timeMs.toFixed(2)} ms`;
+    } else {
+        return `${(timeMs / 1000).toFixed(2)} s`;
+    }
+}
+
 // Display results
-function displayResult(result, solverName, functionName) {
+function displayResult(result, solverName, functionName, executionTime) {
     const resultDiv = document.getElementById('result');
     resultDiv.style.display = 'block';
 
@@ -294,6 +305,7 @@ function displayResult(result, solverName, functionName) {
             <p><strong>Function value:</strong> ${result.get_f_value().toFixed(6)}</p>
             <p><strong>Gradient norm:</strong> ${result.get_gradient_norm().toFixed(6)}</p>
             <p><strong>Iterations:</strong> ${result.get_iterations()}</p>
+            <p><strong>Execution time:</strong> ${formatExecutionTime(executionTime)}</p>
         `;
     } else {
         resultDiv.className = 'result error';
@@ -301,18 +313,20 @@ function displayResult(result, solverName, functionName) {
             <h3>❌ ${solverName} failed</h3>
             <p><strong>Function:</strong> ${functionName}</p>
             <p><strong>Error:</strong> ${result.get_error_message()}</p>
+            <p><strong>Execution time:</strong> ${formatExecutionTime(executionTime)}</p>
         `;
     }
 }
 
 // Add to history
-function addToHistory(solverName, functionName, result, initialPoint) {
+function addToHistory(solverName, functionName, result, initialPoint, executionTime) {
     const historyItem = {
         id: Date.now(),
         solverName,
         functionName,
         result,
         initialPoint,
+        executionTime,
         timestamp: new Date().toLocaleString()
     };
 
@@ -343,6 +357,7 @@ function updateHistoryDisplay() {
             <p><strong>Function:</strong> ${item.functionName}</p>
             <p><strong>Initial:</strong> [${item.initialPoint.join(', ')}]</p>
             <p><strong>Result:</strong> [${x}]</p>
+            <p><strong>Execution:</strong> ${item.executionTime ? formatExecutionTime(item.executionTime) : 'N/A'}</p>
             <p><strong>Time:</strong> ${item.timestamp}</p>
         `;
 
@@ -436,6 +451,9 @@ window.runOptimization = function () {
         const solverName = solverInfo[solverType].name;
         const functionName = "Custom Function";
 
+        // Measure execution time
+        const startTime = performance.now();
+
         switch (solverType) {
             case 'gradient_descent':
                 result = solver.solve_gradient_descent(initialPoint, objectiveFunction);
@@ -450,11 +468,14 @@ window.runOptimization = function () {
                 throw new Error('Unknown solver type');
         }
 
+        const endTime = performance.now();
+        const executionTime = endTime - startTime;
+
         // Display results
-        displayResult(result, solverName, functionName);
+        displayResult(result, solverName, functionName, executionTime);
 
         // Add to history
-        addToHistory(solverName, functionName, result, initialPoint);
+        addToHistory(solverName, functionName, result, initialPoint, executionTime);
 
     } catch (error) {
         console.error('Error in runOptimization:', error);
