@@ -33,11 +33,17 @@ custom_js: rand-fact-fetcher
         <img src="{{ project.downloads_badge }}" alt="Downloads" style="vertical-align: text-bottom; display: inline-block;" />
       </a>
       <a href="{{ project.docs }}" style="vertical-align: text-bottom; display: inline-block;">
-        <img src="{{ project.docs_badge }}" alt="Documentation" style="vertical-align: text-bottom;" />
+        <img src="{{ project.docs_badge }}" alt="Documentation" style="vertical-align: text-bottom;  display: inline-block;" />
       </a>
+      {% if project.extra_link and project.extra_link_text %}
+        <a href="{{ project.extra_link }}" style="vertical-align: text-bottom; display: inline-block;">
+          {{ project.extra_link_text }}
+        </a>
+      {% endif %}
     </span>
     <div style=";">
       {{ project.description }}
+
     </div>
   </li>
 {% endfor %}
