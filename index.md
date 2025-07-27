@@ -9,9 +9,9 @@ custom_js: rand-fact-fetcher
 {% include ga.html %}
 
 
-### Blog stuff (WIP)
+### Blog stuff
 - [math](/math-archive)
-- [finance](/fin-archive)
+<!-- - [finance](/fin-archive) -->
 - [computer-science](/cs-archive)
 
 
