@@ -28,6 +28,9 @@ jekyll_analytics:
 include:
   - assets
 
+exclude:
+  - old
+
 plugins:
   - jekyll-feed
   - jekyll-sitemap
