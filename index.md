@@ -11,7 +11,6 @@ custom_js: rand-fact-fetcher
 
 ### Blog stuff (WIP)
 - [math](/math-archive)
-- [finance](/fin-archive)
 - [computer-science](/cs-archive)
 
 
