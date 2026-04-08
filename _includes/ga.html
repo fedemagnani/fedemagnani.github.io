@@ -1,0 +1,9 @@
+{% if site.jekyll_analytics.GoogleAnalytics.id %}
+<script async src="https://www.googletagmanager.com/gtag/js?id={{ site.jekyll_analytics.GoogleAnalytics.id }}"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', '{{ site.jekyll_analytics.GoogleAnalytics.id }}'{% if site.jekyll_analytics.GoogleAnalytics.anonymizeIp %}, { 'anonymize_ip': true }{% endif %});
+</script>
+{% endif %}

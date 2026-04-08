@@ -20,6 +20,11 @@ collections:
     output: true
 
 
+jekyll_analytics:
+  GoogleAnalytics:
+    id: G-HKMV72T3J1
+    anonymizeIp: true
+
 include:
   - assets
 
