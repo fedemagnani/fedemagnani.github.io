@@ -14,16 +14,16 @@ theme_config:
 
 
 collections:
-  projects:
-    output: false
-  writings:
-    output: false
+  archives:
+    output: true
+  home:
+    output: true
 
 
 jekyll_analytics:
-  GoogleAnalytics:          # Add, if you want to track with Google Analytics
-    id: G-HKMV72T3J1         
-    anonymizeIp: true      
+  GoogleAnalytics:
+    id: G-HKMV72T3J1
+    anonymizeIp: true
 
 include:
   - assets

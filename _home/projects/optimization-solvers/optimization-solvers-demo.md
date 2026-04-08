@@ -15,6 +15,4 @@ permalink: /optimization-solvers-demo/
         }
     </style>
 </head>
-{% include ga.html %}
-
 {% include opt-sol-demo.html %} 

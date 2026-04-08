@@ -2,8 +2,9 @@ source "https://rubygems.org"
 
 gem "jekyll", "~> 4.3.0"
 gem "webrick", "~> 1.8"
-gem "csv", "~> 3.2"  # Add this line
+gem "csv", "~> 3.2"
 gem "base64", "~> 0.2"
+gem "logger"
 gem "jektex"
 
 group :jekyll_plugins do
