@@ -1,4 +1,5 @@
 ---
+sitemap: false
 type: project
 title: optimization-solvers
 github: https://github.com/fedemagnani/optimization-solvers

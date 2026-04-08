@@ -1,4 +1,5 @@
 ---
+sitemap: false
 type: writing
 title: Design and analysis of constant function market makers 
 link: https://tesi.luiss.it/38529/
