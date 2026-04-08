@@ -16,10 +16,8 @@ theme_config:
 collections:
   archives:
     output: true
-  projects:
-    output: false
-  writings:
-    output: false
+  home:
+    output: true
 
 
 jekyll_analytics:

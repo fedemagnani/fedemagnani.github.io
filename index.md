@@ -15,7 +15,8 @@ title: Home
 ### Projects
 
 <ul>
-{% for project in site.projects %}
+{% assign projects = site.home | where: "type", "project" %}
+{% for project in projects %}
 <li>
   <strong><a href="{{ project.github }}">{{ project.title }}</a></strong>
   <a href="{{ project.github }}"><img src="{{ project.stars_badge }}" alt="Stars" style="display:inline-block" /></a>
@@ -32,7 +33,8 @@ title: Home
 ### Writings
 
 <ul>
-{% for writing in site.writings %}
+{% assign writings = site.home | where: "type", "writing" %}
+{% for writing in writings %}
 <li>
   <strong><a href="{{ writing.link }}">{{ writing.title }}</a></strong>
   <div>{{ writing.description }}</div>

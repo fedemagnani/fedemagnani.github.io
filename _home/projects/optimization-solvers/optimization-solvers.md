@@ -1,4 +1,5 @@
 ---
+type: project
 title: optimization-solvers
 github: https://github.com/fedemagnani/optimization-solvers
 cratesdotio: https://crates.io/crates/optimization-solvers
