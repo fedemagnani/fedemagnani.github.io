@@ -1,3 +1,8 @@
 README.md
 old
 _site
+node_modules
+.next
+package-lock.json
+.jekyll-cache
+.jektex-cache
