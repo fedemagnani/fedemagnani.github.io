@@ -1,4 +1,5 @@
 ---
+share: true
 layout: post
 title: "Rusty gotchas"
 category: cs
