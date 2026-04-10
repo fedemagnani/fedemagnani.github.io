@@ -116,7 +116,45 @@ Set $$\mu = 0$$ and the lower bound degenerates into the tangent hyperplane — 
 
 The secret sauce of strong convexity is that the gradient is guaranteed to change in an appreciable way at every step. For a $$\mu$$-strongly convex function, $$\|\nabla f(x)\|$$ grows at least proportionally to $$\|x - x^\star\|$$: a big gradient means you're far from the optimum, a small gradient means you're close. At every iterate, the gradient norm lets you prelude how close you are to the minimum — it's a *calibrated signal*. This has concrete algorithmic consequences: if you know roughly how far you are, you can take appropriately sized steps — large when far, small when close (assuming the field changes smoothly under your feet, which is what L-smoothness guarantees).
 
-Without strong convexity, the gradient loses this calibration. Consider $$f(x) = \|x\|_1$$: the gradient is $$\pm 1$$ everywhere except the origin — it gives you the direction but says nothing about the distance. Whether you're at $$x = 100$$ or $$x = 0.001$$, the gradient screams with the same intensity. The gradient doesn't change at all as you move, so you have no way to gauge your progress. Without a gradient that scales with the distance, the solver is flying blind — it has no way to modulate its step size based on proximity to the minimum.
+Without strong convexity, the gradient loses this calibration. Consider $$f(x) = \|x\|_1$$: the gradient is $$\pm 1$$ everywhere except the origin — it gives you the direction but says nothing about the distance. Whether you're at $$x = 100$$ or $$x = 0.001$$, the gradient screams with the same intensity. The gradient doesn't change at all as you move, so you have no way to gauge your progress. The same happens with the Huber loss: once you're in the linear regime, the gradient is constant and you can't tell if you're close or far. Without a gradient that scales with the distance, the solver is flying blind — it has no way to modulate its step size based on proximity to the minimum.
+
+Even worse, without strong convexity you lose the guarantee that the minimizer is unique. The function might have a whole subspace of minimizers, or a flat region where the gradient vanishes but you're nowhere near the optimum.
+
+<!-- DESMOS PLACEHOLDER
+**Chart: gradient descent without strong convexity**
+
+Run gradient descent on $$f(x_1, x_2) = \frac{1}{4}(x_1 + x_2)^4$$, which is not strongly convex. The Hessian is $$3(x_1+x_2)^2 \begin{pmatrix} 1 & 1 \\ 1 & 1 \end{pmatrix}$$, which has eigenvalues $$6(x_1+x_2)^2$$ and $$0$$. The zero eigenvalue corresponds to the direction $$(1, -1)$$ (the anti-diagonal): along this direction the function is completely flat. The curvature only exists along $$(1, 1)$$, and it vanishes on the line $$x_1 + x_2 = 0$$.
+
+The gradient is $$\nabla f = ((x_1+x_2)^3,\; (x_1+x_2)^3)$$, so the update rule is:
+- $$x_1^{(k+1)} = x_1^{(k)} - \eta \, (x_1^{(k)}+x_2^{(k)})^3$$
+- $$x_2^{(k+1)} = x_2^{(k)} - \eta \, (x_1^{(k)}+x_2^{(k)})^3$$
+
+Display:
+- Contour lines of $$f$$ in the $$(x_1, x_2)$$ plane (these are parallel strips around the line $$x_1 + x_2 = 0$$)
+- The iterates $$(x_1^{(k)}, x_2^{(k)})$$ as dots connected by line segments (e.g. 20-30 iterates)
+- The line $$x_1 + x_2 = 0$$ (the set of minimizers) drawn as a dashed line
+
+Sliders:
+- $$\eta \in [0.01, 0.5]$$ (step size)
+- Starting point draggable or $$(x_1^{(0)}, x_2^{(0)}) = (2, 1)$$
+
+Key behavior: gradient descent moves only along the $$(1, 1)$$ direction (since both gradient components are always equal), approaching the line $$x_1 + x_2 = 0$$ but never sliding along it. The convergence slows down dramatically near the line of minimizers because the curvature vanishes there — the gradient $$(x_1+x_2)^3$$ shrinks cubically. The algorithm converges to $$(\frac{1}{2}, -\frac{1}{2})$$ (the projection of the starting point onto the minimizer line), but the last few iterates barely move. This is the flat direction pathology: no curvature along the kernel direction, and vanishing curvature near the minimizers.
+-->
+
+<!-- DESMOS PLACEHOLDER
+**Chart: pathology — missing strong convexity (1D)**
+
+Plot $$f(x) = \frac{1}{100}x^4$$:
+- The function $$f(x)$$ in bold (red)
+- Its first-order approximation at $$a$$: $$\ell_a(x) = f(a) + f'(a)(x - a)$$ (gray dashed), where $$f'(x) = \frac{4}{100}x^3$$
+- Attempted strong convexity lower bound: $$q^-_a(x) = f(a) + f'(a)(x-a) + \frac{\mu}{2}(x-a)^2$$ (blue)
+
+Sliders:
+- $$a \in [-3,3]$$ (tangent point)
+- $$\mu \in [0.01, 1]$$ (attempted strong convexity parameter)
+
+Key behavior: no matter what $$\mu$$ you pick, the blue parabola will eventually poke above the red curve near the origin (where the function is extremely flat). There is no global $$\mu > 0$$ that works.
+-->
 
 {% include desmos.html
    src="https://www.desmos.com/calculator/uwwlpwydjf?embed"
@@ -133,6 +171,26 @@ Imagine you're kicking a ball blindly toward a target — you can't see the fiel
 That's the core problem without L-smoothness: you find a step size that works well in one region (where the gradient is moderate, the "mud"), you proceed confidently, but you end up in a region where the gradient has exploded (the "ice") — the change in the gradient was way bigger than the change in the input. Using the same step size now produces a catastrophic overshoot, and you might end up further from the minimum than where you began.
 
 Mathematically: remove the upper bound and the function is free to spike arbitrarily. A solver that takes a step based on the current gradient has no guarantee about what the function value will be at the new point — it could be much higher than expected because the curvature exploded between the current point and the next.
+
+Consider $$f(x) = -\ln(x)$$ for $$x > 0$$: the second derivative is $$\frac{1}{x^2}$$, which is unbounded as $$x \to 0$$. Far from the origin the function is gentle (at $$x = 10$$, the curvature is just $$0.01$$), but near the origin the curvature explodes (at $$x = 0.1$$, the curvature is $$100$$). A step size calibrated for the gentle region will massively overshoot if it carries you into the steep region, and a step size conservative enough for the steep region will crawl everywhere else.
+
+In the extreme case of a non-differentiable function like $$f(x) = \|x\|$$, the gradient changes instantaneously at the kink — the effective $$L$$ is infinite at that point. Standard gradient descent simply cannot handle this without modification.
+
+
+<!-- DESMOS PLACEHOLDER
+**Chart: pathology — missing L-smoothness**
+
+Plot $$f(x) = x^4$$:
+- The function $$f(x)$$ in bold (red)
+- Its first-order approximation at $$a$$: $$\ell_a(x) = f(a) + f'(a)(x - a)$$ (gray dashed), where $$f'(x) = 4x^3$$
+- Attempted L-smoothness upper bound: $$Q^+_a(x) = f(a) + f'(a)(x-a) + \frac{L}{2}(x-a)^2$$ (green)
+
+Sliders:
+- $$a \in [-3,3]$$ (tangent point)
+- $$L \in [1, 50]$$ (attempted smoothness parameter)
+
+Key behavior: for any fixed $$L$$, move the tangent point $$a$$ far from the origin and the green parabola will fail to stay above the red curve. The function always escapes the upper bound eventually. No finite $$L$$ works globally.
+-->
 
 {% include desmos.html
    src="https://www.desmos.com/calculator/knzwn4w2tk?embed"
@@ -152,11 +210,7 @@ $$
 
 Each eigenvalue $$\lambda_i(x)$$ is paired with an eigenvector $$v_i(x)$$ — a direction in $$\mathbb{R}^n$$ along which the Hessian acts by simple scaling: $$\nabla^2 f(x) \, v_i(x) = \lambda_i(x) \, v_i(x)$$. If you stand at $$x$$ and take a small step of size $$\varepsilon$$ along $$v_i$$, the second-order Taylor expansion gives
 
-$$
-f(x + \varepsilon v_i) \approx f(x) + \varepsilon \langle \nabla f(x), v_i \rangle + \frac{\varepsilon^2}{2} v_i^\top \nabla^2 f(x) \, v_i = f(x) + \varepsilon \langle \nabla f(x), v_i \rangle + \frac{\lambda_i(x)}{2}\varepsilon^2
-$$
-
-So $$\lambda_i(x)$$ directly controls how much the function curves along the direction $$v_i$$: a large eigenvalue means the function bends sharply in that direction, a small one means it's nearly flat. The eigenvectors define a set of "natural axes" at each point, and the eigenvalues tell you the curvature along each of these axes.
+So if you move along the eigenvector $$v_i$$, the Hessian's contribution to the change in $$f$$ is governed by $$\lambda_i(x)$$: a large eigenvalue means the function bends sharply in that direction, a small one means it's nearly flat. The eigenvectors define a set of "natural axes" at each point, and the eigenvalues tell you the curvature along each of these axes.
 
 ### Strong convexity through the spectrum
 
@@ -166,7 +220,7 @@ $$
 \lambda_1(x) \geq \mu > 0 \quad \forall \; x
 $$
 
-If a single eigenvalue touches zero at some point, you've lost curvature in that direction — the function has a "flat direction" at that point, and strong convexity fails. The parameter $$\mu$$ is the tightest such bound: $$\mu = \inf_x \lambda_1(x)$$. When $$\mu = 0$$, the quadratic lower bound from the sandwich degenerates into the tangent hyperplane: you can no longer guarantee that the function grows away from any point, which means the minimizer might not be unique (or might not exist at all). For gradient descent, this means the gradient carries almost no information about how to move along $$v_i$$ — you're essentially blind in that direction. In the extreme case where $$\lambda_i(x) = 0$$, we have $$\nabla^2 f(x) \, v_i = 0$$, meaning $$v_i$$ belongs to the kernel of the Hessian. The dimension of $$\ker(\nabla^2 f(x))$$ tells you how many independent directions are completely "dead" at $$x$$ — no curvature at all. A one-dimensional kernel is a single flat direction; a large kernel means the function is degenerate in many directions simultaneously. So inspecting the kernel of the Hessian gives you a direct measure of how severely strong convexity is violated at a given point.
+If a single eigenvalue touches zero at some point, you've lost curvature in that direction — the function has a "flat direction" at that point, and strong convexity fails. The parameter $$\mu$$ is the tightest such bound: $$\mu = \inf_x \lambda_1(x)$$. When $$\mu = 0$$, the quadratic lower bound from the sandwich degenerates into the tangent hyperplane: you can no longer guarantee that the function grows away from any point, which means the minimizer might not be unique (or might not exist at all). Looking back at the Taylor expansion, if $$\lambda_i(x) \approx 0$$ the second-order term $$\frac{\lambda_i}{2}\varepsilon^2$$ essentially vanishes: moving along $$v_i$$ barely changes the function's value, so the landscape is nearly flat in that direction. For gradient descent, this means the gradient carries almost no information about how to move along $$v_i$$ — you're essentially blind in that direction. In the extreme case where $$\lambda_i(x) = 0$$, we have $$\nabla^2 f(x) \, v_i = 0$$, meaning $$v_i$$ belongs to the kernel of the Hessian. The dimension of $$\ker(\nabla^2 f(x))$$ tells you how many independent directions are completely "dead" at $$x$$ — no curvature at all. A one-dimensional kernel is a single flat direction; a large kernel means the function is degenerate in many directions simultaneously. So inspecting the kernel of the Hessian gives you a direct measure of how severely strong convexity is violated at a given point.
 
 ### L-smoothness through the spectrum
 
@@ -178,9 +232,11 @@ $$
 
 The parameter $$L$$ is the tightest such bound: $$L = \sup_x \lambda_n(x)$$. When this bound fails — that is, when $$\lambda_n(x)$$ is unbounded — there is no finite $$L$$ and the function is not smooth.
 
+To see what this means concretely, go back to the Taylor expansion. The second-order term along the eigenvector $$v_n$$ associated with the largest eigenvalue is $$\frac{\lambda_n(x)}{2}\varepsilon^2$$. If $$\lambda_n(x)$$ is huge, even a tiny step $$\varepsilon$$ along $$v_n$$ causes a massive change in function value — the landscape is extremely steep in that direction. A solver that picks a step size calibrated for the gentler directions will wildly overshoot along $$v_n$$.
+
 But the real problem is when $$\lambda_n(x)$$ is not just large but *varies dramatically across the domain*. Consider $$f(x) = x^4$$: the second derivative is $$12x^2$$, which is nearly zero near the origin but explodes as $$\|x\|$$ grows. At $$x = 0$$ the Hessian says "the function is flat, take a big step"; at $$x = 10$$ the Hessian says "the function is curving at rate 1200, tread carefully". No single $$L$$ can faithfully describe this function's curvature everywhere, and a solver that trusts a global step size $$1/L$$ is either being reckless (if $$L$$ is too small) or excessively timid (if $$L$$ is set to accommodate the worst case).
 
-In the most extreme scenario, if at some point $$x$$ the eigenvalue $$\lambda_n(x) \to \infty$$, the quadratic upper bound from the sandwich becomes vacuous: no finite parabola can cap the function from above. The descent lemma breaks down and the solver has no reliable model of what happens after a step — much like our golf analogy, the terrain between here and there could be anything.
+In the most extreme scenario, if at some point $$x$$ the eigenvalue $$\lambda_n(x) \to \infty$$, the quadratic upper bound from the sandwich becomes vacuous: no finite parabola can cap the function from above. The descent lemma breaks down and the solver has no reliable model of what happens after a step — much like kicking the ball on ice, the solver has no idea where it will land.
 
 Zooming out, recall that applying the Hessian to an eigenvector simply returns the same eigenvector rescaled by the corresponding eigenvalue: $$\nabla^2 f(x) \, v_i = \lambda_i(x) \, v_i$$. The eigenvalue is the rescaling factor. Now, $$\mu$$ and $$L$$ define the bounds of the spectrum: all eigenvalues of $$\nabla^2 f(x)$$ at every point $$x$$ must live in the interval $$[\mu, L]$$, meaning all these rescaling factors are confined to this range. The spread of this interval — ultimately captured by $$\kappa = L/\mu$$ — tells you how much variability there is in how the Hessian rescales different directions.
 
@@ -190,21 +246,6 @@ When $$\kappa$$ is large, the interval $$[\mu, L]$$ is wide: different eigenvect
 
 For a concrete example, consider a quadratic $$f(x) = \frac{1}{2} x^\top H x$$ where $$H = \text{diag}(\mu, L)$$. The Hessian is $$H$$ everywhere, so the ellipsoid has semi-axes of length $$1/\sqrt{\mu}$$ and $$1/\sqrt{L}$$, and the eccentricity ratio is $$\sqrt{\kappa}$$.
 
-<!-- DESMOS PLACEHOLDER
-**Chart: sublevel set eccentricity**
-
-Plot the level curve of $$f(x_1, x_2) = \frac{\mu}{2}x_1^2 + \frac{L}{2}x_2^2$$ at level $$c = 1$$:
-- The ellipse $$\frac{x_1^2}{2/\mu} + \frac{x_2^2}{2/L} = 1$$, i.e. parametrically $$x_1 = \sqrt{2/\mu}\cos(t),\; x_2 = \sqrt{2/L}\sin(t)$$
-- Mark the semi-axes lengths $$\sqrt{2/\mu}$$ (horizontal) and $$\sqrt{2/L}$$ (vertical)
-- Overlay the gradient vector $$\nabla f(a_1, a_2) = (\mu a_1,\; L a_2)$$ at a draggable point $$(a_1, a_2)$$ on the ellipse
-- Also draw the line from $$(a_1, a_2)$$ to the origin, to contrast gradient direction vs. direction-to-minimum
-
-Sliders:
-- $$\mu \in [0.1, 5]$$
-- $$L \in [\mu, 10]$$
-
-Key behavior: when $$\mu = L$$ the ellipse becomes a circle and the gradient points radially inward (straight to the minimum). As $$L/\mu$$ grows, the ellipse stretches and the gradient angle deviates from the radial direction — this is the zigzagging phenomenon of gradient descent.
--->
 
 {% include desmos.html
    src="https://www.desmos.com/calculator/jfw2uvz8kg?embed"
@@ -241,23 +282,10 @@ $$
 
 is convex. The Hessian of $$h$$ is $$\nabla^2 f(x) - \mu I$$, which is PSD if and only if every eigenvalue of $$\nabla^2 f(x)$$ is at least $$\mu$$.
 
-This is particularly handy in practice. For instance, to check that $$f(x) = \log(1 + e^x)$$ is $$L$$-smooth, just plot $$\frac{L}{2}x^2 - \log(1 + e^x)$$ for different values of $$L$$: the smallest $$L$$ for which this function "looks convex" (no dips, no concave regions) is the smoothness constant. For the softplus, you'll find that the critical value is $$L = \frac{1}{4}$$, matching $$\sup_x f''(x) = \sup_x \frac{e^x}{(1+e^x)^2} = \frac{1}{4}$$.
+Check the chart below: the two helper functions become convex only when $$\mu \leq 1$$ and when $$L\geq 3$$
 
-<!-- DESMOS PLACEHOLDER
-**Chart: the L-smoothness verification trick**
-
-Plot the following for $$f(x) = \log(1+e^x)$$:
-- The function $$g(x) = \frac{L}{2}x^2 - \log(1+e^x)$$ (purple, bold)
-- A horizontal reference line at the minimum of $$g$$ (to help eyeball convexity)
-
-Slider: $$L \in [0.05, 1]$$
-
-Key behavior: for $$L < 1/4$$, the function $$g(x)$$ has a visible concave dip near $$x = 0$$. At $$L = 1/4$$, the concavity vanishes and $$g$$ becomes convex (the critical transition point). For $$L > 1/4$$, it is clearly convex and increasingly so.
-
-Optional addition: overlay $$f''(x) = \frac{e^x}{(1+e^x)^2}$$ in a secondary plot with a horizontal line at height $$L$$, to show that convexity of $$g$$ kicks in exactly when the horizontal line dominates the second derivative everywhere.
--->
 {% include desmos.html
-   src="https://www.desmos.com/calculator/cf4ljvziyp?embed"
+   src="https://www.desmos.com/calculator/x3yzcddnb8?embed"
    height="500" %}
 
 ## [Wrapping up](#wrapping-up)
@@ -265,7 +293,7 @@ Optional addition: overlay $$f''(x) = \frac{e^x}{(1+e^x)^2}$$ in a secondary plo
 Here is what we covered:
 - **Strong convexity** guarantees a quadratic lower bound: the function curves away from its tangent with minimum curvature $$\mu$$
 - **L-smoothness** guarantees a quadratic upper bound: the function can't curve faster than $$L$$
-- Together they produce the **quadratic sandwich**, controlled by the condition number $$\kappa = L/\mu$$
+- Together they produce the **quadratic sandwich**, controlled by the condition number $$\kappa = L/\mu$$, which proxies the relative distance betweenn the quadratic gaps of the two bounds
 - At the **spectral level**, these properties correspond to global bounds on the Hessian eigenvalues: $$\mu \leq \lambda_i(x) \leq L$$
 - The **verification trick** reduces checking these properties to plain convexity of a modified function
 
@@ -337,6 +365,6 @@ $$
 
 which is exactly the descent lemma. $$\square$$
 
-Notice that this proof did not require convexity of $$f$$ — only differentiability and the Lipschitz condition on the gradient. Convexity gives you the reverse direction (the descent lemma implies Lipschitz gradients for convex functions), making the two characterizations equivalent in the convex setting. For this reverse implication, see [Nesterov, Lectures on Convex Optimization, Theorem 2.1.5].
+Notice that this proof did not require convexity of $$f$$ — only differentiability and the Lipschitz condition on the gradient. Convexity gives you the reverse direction (the descent lemma implies Lipschitz gradients for convex functions), making the two characterizations equivalent in the convex setting.
 
 ---
