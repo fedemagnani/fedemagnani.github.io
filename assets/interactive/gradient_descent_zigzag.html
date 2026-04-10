@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gradient descent zigzag</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            padding: 1.5rem;
+            max-width: 700px;
+            margin: auto;
+            color: #1a1a1a;
+            background: #fff;
+        }
+
+        label {
+            font-size: 13px;
+            color: #666;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        input[type=range] {
+            width: 100%;
+            accent-color: #E24B4A;
+        }
+
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 12px;
+        }
+
+        .controls>div {
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .metrics {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .metric {
+            background: #f5f5f3;
+            border-radius: 8px;
+            padding: 8px 12px;
+        }
+
+        .metric .lbl {
+            font-size: 12px;
+            color: #888;
+        }
+
+        .metric .val {
+            font-size: 18px;
+            font-weight: 500;
+        }
+
+        .legend {
+            display: flex;
+            gap: 16px;
+            font-size: 12px;
+            color: #888;
+            margin-top: 4px;
+        }
+
+        .legend span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .legend .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 2px;
+        }
+
+        h1 {
+            font-size: 18px;
+            font-weight: 500;
+            margin-bottom: 16px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Level sets of <span id="title-math"></span></h1>
+
+    <div class="controls">
+        <div>
+            <label>&mu; = <span id="mu-val">0.5</span></label>
+            <input type="range" min="0.1" max="5" step="0.1" value="0.5" id="mu-slider">
+        </div>
+        <div>
+            <label>L = <span id="L-val">5.0</span></label>
+            <input type="range" min="0.1" max="10" step="0.1" value="5" id="L-slider">
+        </div>
+        <div>
+            <label>&eta; = <span id="eta-val">0.18</span></label>
+            <input type="range" min="0.01" max="0.5" step="0.01" value="0.18" id="eta-slider">
+        </div>
+    </div>
+
+    <div class="metrics">
+        <div class="metric">
+            <div class="lbl">&kappa; = L/&mu;</div>
+            <div class="val" id="kappa-val">10.0</div>
+        </div>
+        <div class="metric">
+            <div class="lbl">&eta; &times; L</div>
+            <div class="val" id="etaL-val">0.90</div>
+        </div>
+        <div class="metric">
+            <div class="lbl">Steps shown</div>
+            <div class="val" id="steps-val">50</div>
+        </div>
+    </div>
+
+    <svg id="main-svg" viewBox="-220 -170 440 340" style="width:100%;height:auto;max-height:420px;">
+        <line x1="-210" y1="0" x2="210" y2="0" stroke="#e0e0e0" stroke-width="0.5" />
+        <line x1="0" y1="-160" x2="0" y2="160" stroke="#e0e0e0" stroke-width="0.5" />
+        <text x="212" y="4" fill="#888" font-size="11" font-family="system-ui">x&#x2081;</text>
+        <text x="4" y="-155" fill="#888" font-size="11" font-family="system-ui">x&#x2082;</text>
+        <g id="contours"></g>
+        <polyline id="path-line" fill="none" stroke="#E24B4A" stroke-width="1.5" />
+        <g id="dots"></g>
+        <circle cx="0" cy="0" r="3.5" fill="#1a1a1a" />
+        <text x="6" y="-4" fill="#888" font-size="11" font-family="system-ui">x*</text>
+    </svg>
+
+    <div class="legend">
+        <span><span class="dot" style="background:#E24B4A;"></span>GD trajectory</span>
+        <span><span class="dot" style="background:#e0e0e0;"></span>Level sets</span>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+    <script>
+        katex.render('f(x_1, x_2) = \\frac{\\mu}{2}x_1^2 + \\frac{L}{2}x_2^2', document.getElementById('title-math'));
+
+        const muS = document.getElementById('mu-slider');
+        const LS = document.getElementById('L-slider');
+        const etaS = document.getElementById('eta-slider');
+        const muV = document.getElementById('mu-val');
+        const LV = document.getElementById('L-val');
+        const etaV = document.getElementById('eta-val');
+        const kappaV = document.getElementById('kappa-val');
+        const etaLV = document.getElementById('etaL-val');
+        const stepsV = document.getElementById('steps-val');
+        const pathLine = document.getElementById('path-line');
+        const contG = document.getElementById('contours');
+        const dotsG = document.getElementById('dots');
+        const S = 80;
+        const NSTEPS = 50;
+        const x0 = [1.8, 0.5];
+
+        function draw() {
+            let mu = parseFloat(muS.value);
+            let L = parseFloat(LS.value);
+            let eta = parseFloat(etaS.value);
+            if (L < mu) { L = mu; LS.value = mu; }
+            muV.textContent = mu.toFixed(1);
+            LV.textContent = L.toFixed(1);
+            etaV.textContent = eta.toFixed(2);
+            kappaV.textContent = (L / mu).toFixed(1);
+            const eL = eta * L;
+            etaLV.textContent = eL.toFixed(2);
+            etaLV.style.color = eL > 1 ? '#E24B4A' : eL > 0.9 ? '#BA7517' : '#1a1a1a';
+
+            contG.innerHTML = '';
+            const levels = [0.2, 0.5, 1.0, 1.8, 3.0];
+            for (const c of levels) {
+                const a = Math.sqrt(2 * c / mu) * S;
+                const b = Math.sqrt(2 * c / L) * S;
+                if (a > 210 || b > 165) continue;
+                const el = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
+                el.setAttribute('cx', 0);
+                el.setAttribute('cy', 0);
+                el.setAttribute('rx', a);
+                el.setAttribute('ry', b);
+                el.setAttribute('fill', 'none');
+                el.setAttribute('stroke', '#e0e0e0');
+                el.setAttribute('stroke-width', '0.5');
+                contG.appendChild(el);
+            }
+
+            let pts = [x0.slice()];
+            let x = x0.slice();
+            for (let i = 0; i < NSTEPS; i++) {
+                const gx = mu * x[0];
+                const gy = L * x[1];
+                x = [x[0] - eta * gx, x[1] - eta * gy];
+                pts.push(x.slice());
+                if (Math.abs(x[0]) > 5 || Math.abs(x[1]) > 5) break;
+            }
+            stepsV.textContent = pts.length - 1;
+
+            let polyStr = pts.map(p => (p[0] * S).toFixed(2) + ',' + (-p[1] * S).toFixed(2)).join(' ');
+            pathLine.setAttribute('points', polyStr);
+
+            dotsG.innerHTML = '';
+            pts.forEach((p, i) => {
+                const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                c.setAttribute('cx', (p[0] * S).toFixed(2));
+                c.setAttribute('cy', (-p[1] * S).toFixed(2));
+                c.setAttribute('r', i === 0 ? 4 : 2);
+                c.setAttribute('fill', i === 0 ? '#D85A30' : '#E24B4A');
+                if (i === 0) { c.setAttribute('stroke', '#fff'); c.setAttribute('stroke-width', '1.5'); }
+                dotsG.appendChild(c);
+            });
+        }
+
+        muS.addEventListener('input', draw);
+        LS.addEventListener('input', draw);
+        etaS.addEventListener('input', draw);
+        draw();
+    </script>
+</body>
+
+</html>
