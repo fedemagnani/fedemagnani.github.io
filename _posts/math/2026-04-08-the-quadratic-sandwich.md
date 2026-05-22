@@ -299,7 +299,7 @@ Here is what we covered:
 
 These two properties are among the most important structural assumptions in optimization theory. They are the reason gradient descent works well on some problems and terribly on others, and the condition number $$\kappa$$ is the single number that best summarizes the difficulty of a smooth convex problem.
 
-But there is a deeper story lurking here. Strong convexity and L-smoothness are not independent concepts — they are *dual* to each other in a precise sense involving the Fenchel conjugate. If that rings a bell from [a previous post]({% post_url 2025-07-4-fenchel %}), stay tuned.
+But there is a deeper story lurking here. Strong convexity and L-smoothness are not independent concepts — they are *dual* to each other in a precise sense involving the Fenchel conjugate. If that rings a bell from [a previous post]({% post_url math/2025-07-4-fenchel %}), stay tuned.
 
 In the meantime, remember: a well-balanced sandwich is the key to a healthy life — whether it's made of quadratics or whole grain bread. Eat well, optimize well.
 

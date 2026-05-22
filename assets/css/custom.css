@@ -1,0 +1,35 @@
+.w {
+  max-width: 900px;
+}
+
+/* Safety net: hide KaTeX's accessibility MathML even if the CDN katex.css
+   failed to load. Without this, the raw TeX annotation inside <math> tags
+   becomes visible alongside the rendered HTML on some mobile browsers. */
+.katex-mathml {
+  position: absolute !important;
+  clip: rect(1px, 1px, 1px, 1px) !important;
+  -webkit-clip-path: inset(50%) !important;
+  clip-path: inset(50%) !important;
+  width: 1px !important;
+  height: 1px !important;
+  overflow: hidden !important;
+  padding: 0 !important;
+  border: 0 !important;
+}
+
+/* The JS fitter in _includes/mathjax.html sets font-size on .katex-display
+   to shrink wide equations to fit. We deliberately do NOT clip overflow here,
+   so that if JS is disabled or the fitter fails, equations remain visible
+   (overflowing the column) rather than disappearing. */
+.katex-display {
+  max-width: 100%;
+}
+
+/* Once the fitter has measured an equation and applied a fit, it adds this
+   class — at which point we can safely hide any sub-pixel overflow. */
+.katex-display.is-fitted {
+  overflow: hidden;
+}
+
+/* Don't constrain .katex with max-width — the fitter needs to measure its
+   natural content width to compute the correct shrink factor. */

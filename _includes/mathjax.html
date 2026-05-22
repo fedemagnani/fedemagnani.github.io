@@ -1,1 +1,79 @@
-<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<!--
+  Math rendering strategy:
+
+  - LOCAL builds: jektex pre-renders every $$...$$ block into KaTeX HTML at
+    build time. By the time this script runs there's nothing to render — the
+    auto-render call below is a no-op because there are no raw delimiters in
+    the DOM. The fitter runs immediately.
+
+  - GITHUB PAGES builds: jektex is not on the GH Pages plugin whitelist, so
+    math is emitted as raw kramdown delimiters (\(..\) for inline, \[..\] for
+    display). KaTeX's auto-render extension finds those at runtime, replaces
+    them with rendered KaTeX HTML, and then the fitter runs.
+
+  Either way, after this script finishes the DOM has .katex / .katex-display
+  elements that fitDisplayMath() can size to fit the column.
+-->
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"
+        crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+        crossorigin="anonymous"
+        onload="renderMathOnPage()"></script>
+
+<script>
+  function renderMathOnPage() {
+    if (typeof renderMathInElement === 'function') {
+      renderMathInElement(document.body, {
+        delimiters: [
+          { left: '$$',  right: '$$',  display: true  },
+          { left: '\\[', right: '\\]', display: true  },
+          { left: '\\(', right: '\\)', display: false }
+        ],
+        throwOnError: false
+      });
+    }
+    fitDisplayMath();
+  }
+
+  // KaTeX uses em-based sizing throughout; shrinking font-size on the
+  // .katex-display wrapper re-flows the equation proportionally so it fits
+  // its column with no clipping or scrollbar.
+  function fitDisplayMath() {
+    const column = document.querySelector('.w');
+    let available;
+    if (column) {
+      const cs = getComputedStyle(column);
+      available = column.clientWidth
+        - parseFloat(cs.paddingLeft || 0)
+        - parseFloat(cs.paddingRight || 0);
+    } else {
+      available = window.innerWidth - 32;
+    }
+
+    document.querySelectorAll('.katex-display').forEach((el) => {
+      el.style.fontSize = '';
+      const inner = el.querySelector('.katex');
+      if (!inner) return;
+      const natural = Math.max(
+        inner.scrollWidth,
+        inner.getBoundingClientRect().width
+      );
+      if (!natural || natural <= available + 1) return;
+      const scale = (available - 1) / natural;
+      el.style.fontSize = (scale * 100).toFixed(3) + '%';
+      el.classList.add('is-fitted');
+    });
+  }
+
+  // Run the fitter on already-present (jektex pre-rendered) math too.
+  document.addEventListener('DOMContentLoaded', fitDisplayMath);
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(fitDisplayMath);
+  }
+
+  let fitTimer;
+  window.addEventListener('resize', () => {
+    clearTimeout(fitTimer);
+    fitTimer = setTimeout(fitDisplayMath, 120);
+  });
+</script>
