@@ -1,0 +1,325 @@
+<!-- Cone sensitivities → quantum catches → point in R^3. Self-contained: inline SVG + vanilla JS, no dependencies.
+     Font: Excalifont (Excalidraw's current hand-drawn face, OFL), served from your site first and unpkg as fallback;
+     Virgil (Excalidraw's original face) as a further fallback. Right panel: drag to rotate, ctrl/⌘ + wheel or pinch to zoom, double-click to reset. -->
+<style>
+  @font-face { font-family: "Excalifont"; font-display: swap;
+    src: url("{{ site.baseurl }}/assets/fonts/Excalifont-Regular-latin.woff2") format("woff2"),
+         url("https://unpkg.com/@excalidraw/excalidraw@0.18.1/dist/prod/fonts/Excalifont/Excalifont-Regular-a88b72a24fb54c9f94e3b5fdaa7481c9.woff2") format("woff2");
+    unicode-range: U+20-7E, U+A0-FF, U+2013-2014, U+2018-201E, U+2020-2022, U+2026, U+2030, U+2039-203A, U+2044, U+20AC, U+2122, U+2212; }
+  @font-face { font-family: "Excalifont"; font-display: swap;
+    src: url("{{ site.baseurl }}/assets/fonts/Excalifont-Regular-greek.woff2") format("woff2"),
+         url("https://unpkg.com/@excalidraw/excalidraw@0.18.1/dist/prod/fonts/Excalifont/Excalifont-Regular-41b173a47b57366892116a575a43e2b6.woff2") format("woff2");
+    unicode-range: U+37E, U+384-38A, U+38C, U+38E-3A1, U+3A3-3CE; }
+  @font-face { font-family: "Virgil"; font-display: swap;
+    src: url("https://unpkg.com/@excalidraw/excalidraw@0.18.1/dist/prod/fonts/Virgil/Virgil-Regular.woff2") format("woff2"); }
+  .cone-embedding { --ce-ink: currentColor; font-family: "Excalifont", "Virgil", "Segoe Print", "Comic Sans MS", cursive; font-size: 15px; line-height: 1.3; margin: 1.5em 0; }
+  .cone-embedding .ce-sliders { display: flex; gap: .5em 1.6em; align-items: center; justify-content: center; flex-wrap: wrap; margin-bottom: .6em; }
+  .cone-embedding .ce-sliders label { display: flex; align-items: center; gap: .5em; }
+  .cone-embedding .ce-play { width: 2em; height: 2em; padding: 0; cursor: pointer; background: transparent; color: inherit; font: inherit; line-height: 1;
+    border: 1.6px solid currentColor; border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px; display: inline-flex; align-items: center; justify-content: center; }
+  .cone-embedding .ce-play:hover { background: rgba(127,127,127,.12); }
+  .cone-embedding .ce-play svg { width: 1em; height: 1em; }
+  .cone-embedding input[type=range] { accent-color: currentColor; width: 150px; }
+  .cone-embedding .ce-val { min-width: 4.5em; font-variant-numeric: tabular-nums; }
+</style>
+<figure class="cone-embedding">
+  <div class="ce-sliders">
+    <label>
+      <button type="button" class="ce-play" data-ce="play-mu" aria-label="play/pause peak"></button>
+      peak <input type="range" data-ce="mu" min="320" max="840" step="1" value="500">
+      <span class="ce-val" data-ce="muv">500 nm</span>
+    </label>
+    <label>
+      <button type="button" class="ce-play" data-ce="play-sigma" aria-label="play/pause spread"></button>
+      spread <input type="range" data-ce="sigma" min="6" max="60" step="1" value="30" style="width:110px">
+      <span class="ce-val" data-ce="sigmav">σ = 30</span>
+    </label>
+  </div>
+  <svg data-ce="svg" viewBox="0 0 1070 440" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:auto; display:block; font-family:inherit; color:inherit; fill:currentColor; user-select:none;">
+    <defs>
+      <!-- hand-drawn wobble, applied to graphics only (text stays crisp, like Excalidraw) -->
+      <filter id="ce-rough" x="-5%" y="-5%" width="110%" height="110%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.016" numOctaves="2" seed="7" result="n"/>
+        <feDisplacementMap in="SourceGraphic" in2="n" scale="3" xChannelSelector="R" yChannelSelector="G"/>
+      </filter>
+      <marker id="ce-arrow-sm" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="9" markerHeight="9" markerUnits="userSpaceOnUse" orient="auto">
+        <path d="M3,3 L10,6 L3,9" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </marker>
+      <marker id="ce-arrow" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="9" markerHeight="9" orient="auto-start-reverse">
+        <path d="M2,2 L10,6 L2,10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+      </marker>
+    </defs>
+
+    <!-- ===== Far left: the light source itself, then arrows: source → cones → embedding ===== -->
+    <g id="ce-source">
+      <g filter="url(#ce-rough)">
+        <circle id="ce-halo" cx="70" cy="165" r="40" fill="#888" opacity=".18"/>
+        <g id="ce-rays" stroke="#888" stroke-width="2.2" stroke-linecap="round"></g>
+        <circle id="ce-bulb" cx="70" cy="165" r="21" fill="#888" stroke="currentColor" stroke-width="1.8"/>
+                <line x1="144" y1="165" x2="168" y2="165" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" marker-end="url(#ce-arrow-sm)"/>
+        <line x1="700" y1="165" x2="724" y2="165" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" marker-end="url(#ce-arrow-sm)"/>
+      </g>
+      <text x="70" y="236" text-anchor="middle" font-size="13" opacity=".8">light source</text>
+    </g>
+
+    <!-- ===== Left panel: source spectrum & human cone sensitivities ===== -->
+    <g id="ce-left" transform="translate(160,0)">
+      <text x="270" y="24" text-anchor="middle" font-size="16">Quantum catches</text>
+      <!-- plot area 40..500 × 45..285; visible band 380–780 inside a 320–840 window -->
+      <g filter="url(#ce-rough)">
+        <rect id="ce-uv" y="45" height="240" fill="currentColor" opacity=".07"/>
+        <rect id="ce-ir" y="45" height="240" fill="currentColor" opacity=".07"/>
+        <path id="ce-s-fill" fill="#6a5acd" fill-opacity=".22"/>
+        <path id="ce-m-fill" fill="#2e9e4f" fill-opacity=".22"/>
+        <path id="ce-l-fill" fill="#d9442b" fill-opacity=".22"/>
+        <path id="ce-s-line" fill="none" stroke="#6a5acd" stroke-width="1.8" stroke-linecap="round"/>
+        <path id="ce-m-line" fill="none" stroke="#2e9e4f" stroke-width="1.8" stroke-linecap="round"/>
+        <path id="ce-l-line" fill="none" stroke="#d9442b" stroke-width="1.8" stroke-linecap="round"/>
+        <path id="ce-spec-fill" fill="#888" fill-opacity=".5"/>
+        <path id="ce-spec" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>
+        <!-- axes -->
+        <line x1="40" y1="285" x2="508" y2="285" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" marker-end="url(#ce-arrow)"/>
+        <line x1="40" y1="290" x2="40" y2="32" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" marker-end="url(#ce-arrow)"/>
+        <g id="ce-ticks-lines" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"></g>
+      </g>
+      <g id="ce-ticks" font-size="12" text-anchor="middle"></g>
+      <text id="ce-uv-t" y="170" font-size="12" text-anchor="middle" opacity=".7">UV</text>
+      <text id="ce-ir-t" y="170" font-size="12" text-anchor="middle" opacity=".7">IR</text>
+      <text id="ce-lab-s" y="62" font-size="14" fill="#6a5acd" text-anchor="middle">p<tspan baseline-shift="sub" font-size="10">s</tspan></text>
+      <text id="ce-lab-m" y="62" font-size="14" fill="#2e9e4f" text-anchor="end">p<tspan baseline-shift="sub" font-size="10">m</tspan></text>
+      <text id="ce-lab-l" y="62" font-size="14" fill="#d9442b" text-anchor="start">p<tspan baseline-shift="sub" font-size="10">l</tspan></text>
+      <text id="ce-speclabel-t" font-size="14" text-anchor="middle">N(λ)</text>
+      <text x="502" y="320" font-size="13" text-anchor="end">wavelength λ (nm)</text>
+      <text x="34" y="42" font-size="13" text-anchor="end">N, p</text>
+
+      <!-- quantum catch bars -->
+      <g id="ce-bars" font-size="13">
+        <g id="ce-bar-frames" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"></g>
+        <g filter="url(#ce-rough)">
+          <rect id="ce-barS" x="70" y="364" width="0" height="14" fill="#6a5acd" fill-opacity=".45"/>
+          <rect id="ce-barM" x="70" y="390" width="0" height="14" fill="#2e9e4f" fill-opacity=".45"/>
+          <rect id="ce-barL" x="70" y="416" width="0" height="14" fill="#d9442b" fill-opacity=".45"/>
+          <rect id="ce-barS-cap" x="70" y="364" width="0" height="14" fill="none" stroke="#6a5acd" stroke-width="1.6"/>
+          <rect id="ce-barM-cap" x="70" y="390" width="0" height="14" fill="none" stroke="#2e9e4f" stroke-width="1.6"/>
+          <rect id="ce-barL-cap" x="70" y="416" width="0" height="14" fill="none" stroke="#d9442b" stroke-width="1.6"/>
+        </g>
+        <text x="60" y="375" text-anchor="end" fill="#6a5acd">S</text><text id="ce-valS" x="480" y="375" opacity=".85">0.00</text>
+        <text x="60" y="401" text-anchor="end" fill="#2e9e4f">M</text><text id="ce-valM" x="480" y="401" opacity=".85">0.00</text>
+        <text x="60" y="427" text-anchor="end" fill="#d9442b">L</text><text id="ce-valL" x="480" y="427" opacity=".85">0.00</text>
+      </g>
+    </g>
+
+    <!-- ===== Right panel: the point [L, M, S] in R^3 (orbitable) ===== -->
+    <g id="ce-right" transform="translate(161,0)">
+      <text x="722" y="24" text-anchor="middle" font-size="16">LMS tristimulus</text>
+      <text x="722" y="43" text-anchor="middle" font-size="13" opacity=".75">(embedding vector)</text>
+      <rect id="ce-hit" x="535" y="48" width="380" height="372" fill="transparent" style="cursor:grab; touch-action:none;"/>
+      <g filter="url(#ce-rough)" pointer-events="none">
+        <g id="ce-cube" fill="none" stroke="currentColor" stroke-width="1.2" opacity=".28" stroke-linecap="round"></g>
+        <g id="ce-axes" fill="none" stroke-width="1.8" stroke-linecap="round"></g>
+        <polyline id="ce-trail" fill="none" stroke="currentColor" stroke-width="1.6" opacity=".4" stroke-linejoin="round"/>
+        <g id="ce-drop" fill="none" stroke="currentColor" stroke-width="1.2" stroke-dasharray="4 4" opacity=".6">
+          <line id="ce-dropV"/><line id="ce-dropL"/><line id="ce-dropM"/>
+        </g>
+        <circle id="ce-shadow" r="3" fill="currentColor" opacity=".35"/>
+        <circle id="ce-point" r="9" stroke="currentColor" stroke-width="1.8"/>
+      </g>
+      <g id="ce-axlabels" font-size="15" text-anchor="middle" pointer-events="none"></g>
+      <text id="ce-caption" x="722" y="432" text-anchor="middle" font-size="13" opacity=".85" pointer-events="none"></text>
+    </g>
+  </svg>
+</figure>
+
+<script>
+(function () {
+  const fig = document.currentScript.previousElementSibling;
+  const $ = id => fig.querySelector('#' + id);
+  const q = sel => fig.querySelector('[data-ce=' + sel + ']');
+  const muIn = q('mu'), sigIn = q('sigma'), muV = q('muv'), sigV = q('sigmav');
+
+  // ---------- model (schematic, not colorimetric-grade) ----------
+  const LMIN = 320, LMAX = 840, STEP = 2, VIS = [380, 780];
+  const lambdas = [];
+  for (let l = LMIN; l <= LMAX; l += STEP) lambdas.push(l);
+
+  // asymmetric gaussian: different widths left/right of the peak
+  const ag = (l, mu, s1, s2) => { const s = l < mu ? s1 : s2; const z = (l - mu) / s; return Math.exp(-0.5 * z * z); };
+
+  // human cone sensitivities, peaks ~420 / ~530 / ~560 nm
+  const cones = { S: lambdas.map(l => ag(l, 420, 25, 38)), M: lambdas.map(l => ag(l, 530, 52, 48)), L: lambdas.map(l => ag(l, 560, 58, 58)) };
+
+  // CIE 1931 colour-matching functions, analytic fit (Wyman, Sloan & Shirley 2013) — only used to colour the dot
+  const cmf = {
+    x: lambdas.map(l => 1.056 * ag(l, 599.8, 37.9, 31.0) + 0.362 * ag(l, 442.0, 16.0, 26.7) - 0.065 * ag(l, 501.1, 20.4, 26.2)),
+    y: lambdas.map(l => 0.821 * ag(l, 568.8, 46.9, 40.5) + 0.286 * ag(l, 530.9, 16.3, 31.1)),
+    z: lambdas.map(l => 1.217 * ag(l, 437.0, 11.8, 36.0) + 0.681 * ag(l, 459.0, 26.0, 13.8)),
+  };
+  // "visibility" window: 1 inside the visible band, fading to 0 in the UV and IR → the perceived colour goes black out there
+  const vis = lambdas.map(l => l < 400 ? Math.exp(-0.5 * ((400 - l) / 22) ** 2) : l > 720 ? Math.exp(-0.5 * ((l - 720) / 35) ** 2) : 1);
+
+  const integrate = (N, w) => { let a = 0; for (let i = 0; i < N.length; i++) a += N[i] * w[i]; return a * STEP; };
+  const catches = N => ({ S: integrate(N, cones.S), M: integrate(N, cones.M), L: integrate(N, cones.L) });
+  // normalisation: a unit-photon spectrum concentrated at a cone's peak gives catch 1 for that cone
+  const KMAX = { S: Math.max(...cones.S), M: Math.max(...cones.M), L: Math.max(...cones.L) };
+
+  function spectrumColor(N) {
+    const X = integrate(N, cmf.x), Y = integrate(N, cmf.y), Z = integrate(N, cmf.z);
+    let r = 3.2406 * X - 1.5372 * Y - 0.4986 * Z;
+    let g = -0.9689 * X + 1.8758 * Y + 0.0415 * Z;
+    let b = 0.0557 * X - 0.2040 * Y + 1.0570 * Z;
+    const m = Math.min(r, g, b); if (m < 0) { r -= m; g -= m; b -= m; }        // crude gamut mapping
+    const mx = Math.max(r, g, b, 1e-9); r /= mx; g /= mx; b /= mx;              // chromaticity…
+    const k = Math.min(1, integrate(N, vis)); r *= k; g *= k; b *= k;           // …dimmed to black outside the visible band
+    const gam = v => Math.round(255 * (v <= 0.0031308 ? 12.92 * v : 1.055 * Math.pow(v, 1 / 2.4) - 0.055));
+    return `rgb(${gam(r)},${gam(g)},${gam(b)})`;
+  }
+
+  // unit-area gaussian spectrum: one photon in total, spread around mu with s.d. sigma
+  function gaussSpec(mu, sigma) {
+    const N = lambdas.map(l => Math.exp(-0.5 * ((l - mu) / sigma) ** 2));
+    const area = integrate(N, N.map(() => 1));
+    return N.map(v => v / area);
+  }
+
+  // ---------- left panel ----------
+  const PX = { x0: 40, x1: 500, y0: 285, y1: 70 };
+  const xOf = l => PX.x0 + (l - LMIN) / (LMAX - LMIN) * (PX.x1 - PX.x0);
+  const yOf = v => PX.y0 - v * (PX.y0 - PX.y1);
+  const pathOf = (vals, scale = 1) => vals.map((v, i) => (i ? 'L' : 'M') + xOf(lambdas[i]).toFixed(1) + ',' + yOf(v * scale).toFixed(1)).join(' ');
+  const areaOf = (vals, scale = 1) => pathOf(vals, scale) + ` L${xOf(LMAX)},${PX.y0} L${xOf(LMIN)},${PX.y0} Z`;
+
+  for (const k of ['s', 'm', 'l']) { const c = cones[k.toUpperCase()]; $(`ce-${k}-fill`).setAttribute('d', areaOf(c)); $(`ce-${k}-line`).setAttribute('d', pathOf(c)); }
+  $('ce-lab-s').setAttribute('x', xOf(420)); $('ce-lab-m').setAttribute('x', xOf(530) - 2); $('ce-lab-l').setAttribute('x', xOf(560) + 2);
+  { // UV / IR bands and ticks
+    const uv = $('ce-uv'), ir = $('ce-ir');
+    uv.setAttribute('x', xOf(LMIN)); uv.setAttribute('width', xOf(VIS[0]) - xOf(LMIN));
+    ir.setAttribute('x', xOf(VIS[1])); ir.setAttribute('width', xOf(LMAX) - xOf(VIS[1]));
+    $('ce-uv-t').setAttribute('x', (xOf(LMIN) + xOf(VIS[0])) / 2); $('ce-ir-t').setAttribute('x', (xOf(VIS[1]) + xOf(LMAX)) / 2);
+    let tl = '', tt = '';
+    for (let l = 380; l <= 780; l += 80) { tl += `<line x1="${xOf(l)}" y1="285" x2="${xOf(l)}" y2="291"/>`; tt += `<text x="${xOf(l)}" y="304">${l}</text>`; }
+    $('ce-ticks-lines').innerHTML = tl; $('ce-ticks').innerHTML = tt;
+  }
+
+  { // bar frames as hand-jittered rectangles (a displacement filter breaks long thin lines)
+    let seed = 11; const rnd = () => { seed = (seed * 16807) % 2147483647; return seed / 2147483647 - 0.5; };
+    const roughRect = (x, y, w, h) => {
+      const pts = []; const corners = [[x, y], [x + w, y], [x + w, y + h], [x, y + h], [x, y]];
+      for (let c = 0; c < 4; c++) {
+        const [ax, ay] = corners[c], [bx, by] = corners[c + 1], n = Math.max(2, Math.round(Math.hypot(bx - ax, by - ay) / 28));
+        for (let i = 0; i <= n; i++) { const t = i / n; pts.push([ax + (bx - ax) * t + rnd() * 1.4, ay + (by - ay) * t + rnd() * 1.4]); }
+      }
+      return 'M' + pts.map(q => q[0].toFixed(1) + ',' + q[1].toFixed(1)).join(' L') + ' Z';
+    };
+    $('ce-bar-frames').innerHTML = [364, 390, 416].map(y => `<path d="${roughRect(70, y, 400, 14)}"/>`).join('');
+  }
+
+  $('ce-rays').innerHTML = Array.from({ length: 10 }, (_, i) => { const a = i / 10 * 2 * Math.PI + 0.3, c = Math.cos(a), s = Math.sin(a); return `<line x1="${(70 + 27 * c).toFixed(1)}" y1="${(165 + 27 * s).toFixed(1)}" x2="${(70 + 38 * c).toFixed(1)}" y2="${(165 + 38 * s).toFixed(1)}"/>`; }).join('');
+
+  // ---------- right panel: orbit camera ----------
+  const O = { x: 727, y: 240 };
+  const cam0 = { yaw: 0.62, pitch: 0.48, zoom: 150 };
+  const cam = { ...cam0 };
+  function proj(L, M, S) {                                   // a=L, b=M, c=S (up), centred on the cube
+    const a = L - 0.5, b = M - 0.5, c = S - 0.5;
+    const cy = Math.cos(cam.yaw), sy = Math.sin(cam.yaw), cp = Math.cos(cam.pitch), sp = Math.sin(cam.pitch);
+    const u = a * cy - b * sy, v = a * sy + b * cy;
+    return { x: O.x + u * cam.zoom, y: O.y - (c * cp - v * sp) * cam.zoom };
+  }
+  const V = [[0,0,0],[1,0,0],[0,1,0],[0,0,1],[1,1,0],[1,0,1],[0,1,1],[1,1,1]];
+  const E = [[0,1],[0,2],[0,3],[1,4],[2,4],[1,5],[3,5],[2,6],[3,6],[4,7],[5,7],[6,7]];
+  const AX = [{ v: [1,0,0], c: '#d9442b', t: 'L' }, { v: [0,1,0], c: '#2e9e4f', t: 'M' }, { v: [0,0,1], c: '#6a5acd', t: 'S' }];
+  function drawFrame() {
+    const ln = (a, b, extra = '') => { const p = proj(...a), r = proj(...b); return `<line x1="${p.x.toFixed(1)}" y1="${p.y.toFixed(1)}" x2="${r.x.toFixed(1)}" y2="${r.y.toFixed(1)}" ${extra}/>`; };
+    $('ce-cube').innerHTML = E.map(([a, b]) => ln(V[a], V[b])).join('');
+    $('ce-axes').innerHTML = AX.map(ax => ln([0,0,0], ax.v.map(k => k * 1.12), `stroke="${ax.c}" marker-end="url(#ce-arrow)"`)).join('');
+    $('ce-axlabels').innerHTML = AX.map(ax => { const p = proj(...ax.v.map(k => k * 1.25)); return `<text x="${p.x.toFixed(1)}" y="${(p.y + 5).toFixed(1)}" fill="${ax.c}">${ax.t}</text>`; }).join('');
+  }
+  { // drag to rotate, ctrl/⌘ + wheel or pinch to zoom, double-click to reset
+    const hit = $('ce-hit'), svg = q('svg');
+    const ptrs = new Map(); let last = null, pinch0 = null;
+    const sc = () => svg.viewBox.baseVal.width / svg.getBoundingClientRect().width;
+    hit.addEventListener('pointerdown', e => { hit.setPointerCapture(e.pointerId); ptrs.set(e.pointerId, { x: e.clientX, y: e.clientY }); last = { x: e.clientX, y: e.clientY }; hit.style.cursor = 'grabbing'; pinch0 = null; });
+    hit.addEventListener('pointermove', e => {
+      if (!ptrs.has(e.pointerId)) return;
+      ptrs.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      if (ptrs.size === 2) {
+        const [p1, p2] = [...ptrs.values()], d = Math.hypot(p1.x - p2.x, p1.y - p2.y);
+        if (pinch0) cam.zoom = Math.max(60, Math.min(400, cam.zoom * d / pinch0));
+        pinch0 = d; last = null; return;
+      }
+      if (!last) { last = { x: e.clientX, y: e.clientY }; return; }
+      const k = sc() * 0.009;
+      cam.yaw += (e.clientX - last.x) * k;
+      cam.pitch = Math.max(-1.5, Math.min(1.5, cam.pitch + (e.clientY - last.y) * k));
+      last = { x: e.clientX, y: e.clientY };
+    });
+    const up = e => { ptrs.delete(e.pointerId); if (!ptrs.size) { last = null; hit.style.cursor = 'grab'; } pinch0 = null; };
+    hit.addEventListener('pointerup', up); hit.addEventListener('pointercancel', up);
+    hit.addEventListener('wheel', e => { if (!(e.ctrlKey || e.metaKey)) return; e.preventDefault(); cam.zoom = Math.max(60, Math.min(400, cam.zoom * Math.exp(-e.deltaY * 0.002))); }, { passive: false });
+    hit.addEventListener('dblclick', () => Object.assign(cam, cam0));
+  }
+
+  // ---------- sliders with their own play/pause (Desmos-style) ----------
+  const ICON_PLAY = '<svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2.5 L13 8 L4 13.5 Z"/></svg>';
+  const ICON_PAUSE = '<svg viewBox="0 0 16 16" fill="currentColor"><rect x="3.5" y="2.5" width="3.2" height="11" rx="1"/><rect x="9.3" y="2.5" width="3.2" height="11" rx="1"/></svg>';
+  function makeParam(input, label, fmt, period, playing) {
+    const p = { input, label, fmt, period, playing, value: +input.value, min: +input.min, max: +input.max, phase: 0 };
+    p.btn = q('play-' + input.dataset.ce);
+    p.syncPhase = () => { p.phase = Math.acos(Math.max(-1, Math.min(1, 1 - 2 * (p.value - p.min) / (p.max - p.min)))); };
+    p.show = () => { input.value = Math.round(p.value); label.textContent = fmt(Math.round(p.value)); };
+    p.setPlaying = on => { p.playing = on; p.btn.innerHTML = on ? ICON_PAUSE : ICON_PLAY; p.btn.setAttribute('aria-pressed', on); };
+    p.advance = dt => { p.phase += dt / period * 2 * Math.PI; p.value = p.min + (p.max - p.min) * (0.5 - 0.5 * Math.cos(p.phase)); };
+    input.addEventListener('input', () => { p.setPlaying(false); p.value = +input.value; p.syncPhase(); p.show(); trail = []; });
+    p.btn.addEventListener('click', () => { p.syncPhase(); p.setPlaying(!p.playing); });
+    p.syncPhase(); p.setPlaying(playing); p.show();
+    return p;
+  }
+  let trail = [];
+  const P = {
+    mu: makeParam(muIn, muV, v => `${v} nm`, 16000, true),
+    sigma: makeParam(sigIn, sigV, v => `σ = ${v}`, 9000, true),
+  };
+
+  // ---------- render loop ----------
+  function render(N) {
+    const c = catches(N);
+    const n = { S: c.S / KMAX.S, M: c.M / KMAX.M, L: c.L / KMAX.L };   // each in [0,1]
+    const col = spectrumColor(N);
+    // left: spectrum (drawn normalised to the plot height) and its riding label
+    const scale = 0.92 / Math.max(...N, 1e-9);
+    $('ce-spec').setAttribute('d', pathOf(N, scale));
+    $('ce-spec-fill').setAttribute('d', areaOf(N, scale));
+    $('ce-spec-fill').setAttribute('fill', col);
+    $('ce-bulb').setAttribute('fill', col); $('ce-rays').setAttribute('stroke', col); $('ce-halo').setAttribute('fill', col);
+    $('ce-halo').setAttribute('r', (24 + 0.4 * P.sigma.value).toFixed(1));
+    let imax = 0; for (let i = 1; i < N.length; i++) if (N[i] > N[imax]) imax = i;
+    const lt = $('ce-speclabel-t'); lt.setAttribute('x', Math.max(60, Math.min(480, xOf(lambdas[imax])))); lt.setAttribute('y', yOf(N[imax] * scale) - 9);
+    // bars
+    for (const k of ['S', 'M', 'L']) {
+      const w = (400 * n[k]).toFixed(1);
+      $('ce-bar' + k).setAttribute('width', w); $('ce-bar' + k + '-cap').setAttribute('width', w); $('ce-val' + k).textContent = n[k].toFixed(2);
+    }
+    // right: point in the orbitable cube
+    drawFrame();
+    const p = proj(n.L, n.M, n.S), f = proj(n.L, n.M, 0), fL = proj(n.L, 0, 0), fM = proj(0, n.M, 0);
+    $('ce-point').setAttribute('cx', p.x); $('ce-point').setAttribute('cy', p.y); $('ce-point').setAttribute('fill', col);
+    $('ce-shadow').setAttribute('cx', f.x); $('ce-shadow').setAttribute('cy', f.y);
+    const seg = (id, a, b) => { const e = $(id); e.setAttribute('x1', a.x); e.setAttribute('y1', a.y); e.setAttribute('x2', b.x); e.setAttribute('y2', b.y); };
+    seg('ce-dropV', f, p); seg('ce-dropL', fL, f); seg('ce-dropM', fM, f);
+    $('ce-trail').setAttribute('points', trail.map(t => { const s = proj(t[0], t[1], t[2]); return `${s.x.toFixed(1)},${s.y.toFixed(1)}`; }).join(' '));
+    $('ce-caption').textContent = `[L, M, S] = [${n.L.toFixed(2)}, ${n.M.toFixed(2)}, ${n.S.toFixed(2)}]`;
+    return [n.L, n.M, n.S];
+  }
+
+  let t0 = performance.now();
+  function frame(now) {
+    const dt = Math.min(100, now - t0); t0 = now;
+    let moving = false;
+    for (const p of Object.values(P)) if (p.playing) { p.advance(dt); p.show(); moving = true; }
+    const pt = render(gaussSpec(P.mu.value, P.sigma.value));
+    if (moving) { trail.push(pt); if (trail.length > 160) trail.shift(); }
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+</script>
