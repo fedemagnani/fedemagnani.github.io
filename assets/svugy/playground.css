@@ -1,0 +1,144 @@
+/* svugy live playground, adapted from svugy's docs theme to this blog's light layout. */
+
+/* the demo stays inside the text column */
+.svugy-live {
+  width: 100%;
+  margin: 1.5em 0;
+}
+
+/* side by side: the source on the left, the diagram it renders on the right */
+.svugy-playground,
+.svugy-live:not([data-svugy-mounted]) {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+  gap: 16px;
+  align-items: stretch;
+}
+
+.svugy-preview {
+  display: grid;
+  min-height: 280px;
+}
+
+.svugy-preview > object {
+  grid-area: 1 / 1;
+  align-self: center;
+}
+
+.svugy-live object.svugy {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin: 0;
+  border-radius: 14px;
+  /* the diagram follows the reader's color preference; this page is light, so ask it for light */
+  color-scheme: light;
+}
+
+.svugy-editor,
+.svugy-live:not([data-svugy-mounted]) textarea {
+  position: relative;
+  min-height: 280px;
+  border-radius: 14px;
+  background: #f6f8ff;
+  border: 1px solid #e1e4f4;
+  overflow: hidden;
+}
+
+@media (max-width: 900px) {
+  .svugy-playground,
+  .svugy-live:not([data-svugy-mounted]) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .svugy-editor,
+  .svugy-live:not([data-svugy-mounted]) textarea {
+    min-height: 360px;
+  }
+}
+
+.svugy-editor textarea,
+.svugy-editor .svugy-highlight,
+.svugy-live:not([data-svugy-mounted]) textarea {
+  margin: 0;
+  padding: 14px 16px;
+  box-sizing: border-box;
+  width: 100%;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 13px;
+  line-height: 1.5;
+  tab-size: 2;
+  /* both layers wrap the same way, so the caret stays on its highlighted text */
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+  resize: none;
+  color: #14161a;
+}
+
+.svugy-editor textarea,
+.svugy-editor .svugy-highlight {
+  position: absolute;
+  inset: 0;
+  height: 100%;
+  border: 0;
+}
+
+.svugy-editor .svugy-highlight {
+  pointer-events: none;
+  background: transparent;
+}
+
+.svugy-editor .svugy-highlight code {
+  font: inherit;
+  white-space: inherit;
+  padding: 0;
+  background: none;
+  color: inherit;
+}
+
+.svugy-editor textarea {
+  color: transparent;
+  background: transparent;
+  caret-color: #14161a;
+  outline: none;
+}
+
+.svugy-editor textarea::selection {
+  background: rgba(52, 120, 246, 0.25);
+}
+
+.svugy-editor:focus-within {
+  border-color: #3478f6;
+}
+
+.svugy-token-comment { color: #6a7285; font-style: italic; }
+.svugy-token-string { color: #2f7d32; }
+.svugy-token-keyword { color: #8a3ab9; }
+.svugy-token-key { color: #2557c7; }
+.svugy-token-number { color: #b5521f; }
+.svugy-token-arrow { color: #a86b00; font-weight: bold; }
+.svugy-token-punctuation { color: #5b6a80; }
+
+.svugy-diagnostics {
+  list-style: none;
+  padding: 0;
+  margin: 0.5em 0 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12.5px;
+}
+
+.svugy-diagnostics li {
+  padding: 4px 8px;
+  border-left: 3px solid transparent;
+}
+
+.svugy-diagnostics li[data-line] {
+  cursor: pointer;
+}
+
+.svugy-diagnostics .svugy-diagnostic-error { border-color: #d6334f; }
+.svugy-diagnostics .svugy-diagnostic-warning { border-color: #d99a00; }
+.svugy-diagnostics .svugy-diagnostic-status { color: #6a7285; }
