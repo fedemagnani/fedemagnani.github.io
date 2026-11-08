@@ -1,0 +1,37 @@
+{%- comment -%}
+Live svugy playground: Markdown source on the left, the SVG it renders on the right.
+Usage:
+  {% capture webapp %}{% include svugy/webapp.md %}{% endcapture %}
+  {% include svugy-live.html source=webapp svg="/assets/svugy/webapp.svg" %}
+  source: the diagram's text, captured in the post so the publish doctor sees the included file
+  svg:    its pre-rendered SVG, shown until the wasm renderer loads
+Asset paths stay literal so the publish doctor can find and stage them.
+The 5.6MB renderer is fetched only when the demo gets close to the viewport.
+{%- endcomment -%}
+<link rel="stylesheet" href="{{ site.baseurl }}/assets/svugy/playground.css">
+<div class="svugy-live">
+<textarea data-svugy-language="markdown" aria-label="Markdown source">{{ include.source | strip | escape }}</textarea>
+<object class="svugy" type="image/svg+xml" data="{{ site.baseurl }}{{ include.svg }}" aria-label="Rendered diagram"></object>
+</div>
+<script>
+(() => {
+  if (window.svugyLiveLoader) return;
+  window.svugyLiveLoader = true;
+  const loadScript = (src) => new Promise((resolve, reject) => {
+    const script = document.createElement('script');
+    script.src = src;
+    script.onload = resolve;
+    script.onerror = reject;
+    document.body.append(script);
+  });
+  const loadPlayground = () => loadScript('{{ site.baseurl }}/assets/svugy/svugy-wasm.js').then(() => loadScript('{{ site.baseurl }}/assets/svugy/playground.js'));
+  const demos = document.querySelectorAll('.svugy-live');
+  if (!('IntersectionObserver' in window)) { loadPlayground(); return; }
+  const observer = new IntersectionObserver((entries) => {
+    if (!entries.some((entry) => entry.isIntersecting)) return;
+    observer.disconnect();
+    loadPlayground();
+  }, { rootMargin: '800px 0px' });
+  demos.forEach((demo) => observer.observe(demo));
+})();
+</script>
