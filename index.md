@@ -10,6 +10,7 @@ title: Home
 ### Blog stuff (WIP)
 - [math](/math-archive)
 - [computer-science](/cs-archive)
+- [llm](/llm-archive)
 
 
 ### Projects
