@@ -23,11 +23,15 @@
 <script>
   function renderMathOnPage() {
     if (typeof renderMathInElement === 'function') {
+      // Built by concatenation on purpose: jektex scans the rendered page for a
+      // backslash followed by a bracket or paren, and would treat literal
+      // delimiter strings here as math, corrupting this script in local builds.
+      const BS = '\\';
       renderMathInElement(document.body, {
         delimiters: [
-          { left: '$$',  right: '$$',  display: true  },
-          { left: '\\[', right: '\\]', display: true  },
-          { left: '\\(', right: '\\)', display: false }
+          { left: '$$',     right: '$$',     display: true  },
+          { left: BS + '[', right: BS + ']', display: true  },
+          { left: BS + '(', right: BS + ')', display: false }
         ],
         throwOnError: false
       });

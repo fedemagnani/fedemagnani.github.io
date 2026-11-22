@@ -30,6 +30,8 @@ include:
 
 exclude:
   - old
+  - cli
+  - justfile
 
 plugins:
   - jekyll-feed
