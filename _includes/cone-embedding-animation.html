@@ -64,7 +64,7 @@
 
     <!-- ===== Left panel: source spectrum & human cone sensitivities ===== -->
     <g id="ce-left" transform="translate(160,0)">
-      <text x="270" y="24" text-anchor="middle" font-size="16">Quantum catches</text>
+      <text x="270" y="24" text-anchor="middle" font-size="16">Light spectrum and sensitivity functions</text>
       <!-- plot area 40..500 × 45..285; visible band 380–780 inside a 320–840 window -->
       <g filter="url(#ce-rough)">
         <rect id="ce-uv" y="45" height="240" fill="currentColor" opacity=".07"/>
@@ -94,6 +94,8 @@
 
       <!-- quantum catch bars -->
       <g id="ce-bars" font-size="13">
+        <text x="34" y="394" text-anchor="end" font-size="16">Quantum</text>
+        <text x="34" y="413" text-anchor="end" font-size="16">catches</text>
         <g id="ce-bar-frames" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"></g>
         <g filter="url(#ce-rough)">
           <rect id="ce-barS" x="70" y="364" width="0" height="14" fill="#6a5acd" fill-opacity=".45"/>
